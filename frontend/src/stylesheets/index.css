@@ -1,0 +1,43 @@
+@font-face {
+  font-family: BalooTamma;
+  src: local("BalooTamma"),
+    url(./fonts/BalooTamma/BalooTamma2-Regular.ttf) format("truetype");
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: BalooTamma;
+  src: local("BalooTamma"),
+    url(./fonts/BalooTamma/BalooTamma2-Medium.ttf) format("truetype");
+  font-weight: 500;
+}
+
+@font-face {
+  font-family: BalooTamma;
+  src: local("BalooTamma"),
+    url(./fonts/BalooTamma/BalooTamma2-SemiBold.ttf) format("truetype");
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: BalooTamma;
+  src: local("BalooTamma"),
+    url(./fonts/BalooTamma/BalooTamma2-Bold.ttf) format("truetype");
+  font-weight: 700;
+}
+
+@font-face {
+  font-family: BalooTamma;
+  src: local("BalooTamma"),
+    url(./fonts/BalooTamma/BalooTamma2-ExtraBold.ttf) format("truetype");
+  font-weight: 800;
+}
+
+body {
+  margin: 0;
+  font-family: BalooTamma, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
