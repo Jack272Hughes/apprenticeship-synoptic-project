@@ -17,16 +17,14 @@ function generateRandomBytes(totalBytes = 16) {
   return crypto.randomBytes(totalBytes).toString("base64");
 }
 
-function generateJWT(userObject, oldRft) {
+function generateJWT(userObject) {
   const { username, role = "user", oid } = userObject;
-  return (token = jwt.sign(
-    { oid, username, role, rft: generateRefreshToken(username, oldRft) },
-    jwtSecret,
-    { expiresIn: "1s" }
-  ));
+  return (token = jwt.sign({ oid, username, role }, jwtSecret, {
+    expiresIn: "1s"
+  }));
 }
 
-async function validateRefreshToken(expiredToken) {
+async function validateRefreshToken(expiredToken, rft) {
   try {
     jwt.verify(expiredToken, jwtSecret);
   } catch (err) {
@@ -36,7 +34,7 @@ async function validateRefreshToken(expiredToken) {
     }
   } finally {
     const decodedToken = jwt.decode(expiredToken);
-    const hashedToken = createHash(decodedToken.rft);
+    const hashedToken = createHash(rft);
     const tokenValid = await dataAccessor.refreshTokens.validate(
       hashedToken,
       decodedToken.username
@@ -46,4 +44,9 @@ async function validateRefreshToken(expiredToken) {
   }
 }
 
-module.exports = { generateJWT, validateRefreshToken, generateRandomBytes };
+module.exports = {
+  generateJWT,
+  validateRefreshToken,
+  generateRandomBytes,
+  generateRefreshToken
+};

@@ -9,9 +9,13 @@ import "../stylesheets/home.css";
 axios.defaults.withCredentials = true;
 
 export default function Login(props) {
-  const [cookies, setCookie, removeCookie] = useCookies(["authToken"]);
+  const [cookies, setCookie, removeCookie] = useCookies(["authToken", "rft"]);
   const [errorMsg, setErrorMsg] = React.useState("");
   const [signingUp, setSigningup] = React.useState(false);
+
+  React.useEffect(() => {
+    axios.defaults.headers.Authorization = `Bearer ${cookies.authToken}`;
+  }, [cookies.authToken]);
 
   const handleSubmit = event => {
     setErrorMsg("");
@@ -21,6 +25,7 @@ export default function Login(props) {
       .post(`http://localhost:5000/${signingUp ? "signup" : "login"}`, data)
       .then(response => {
         setCookie("authToken", response.data.token);
+        setCookie("rft", response.data.rft);
       })
       .catch(err => {
         console.log(err);
@@ -47,13 +52,17 @@ export default function Login(props) {
         axios
           .post("http://localhost:5000/logout")
           .catch(console.error)
-          .finally(() => removeCookie("authToken"));
+          .finally(() => {
+            removeCookie("rft");
+            removeCookie("authToken");
+          });
       },
       acquireTokenSilent: () => {
         axios
           .post("http://localhost:5000/token")
           .then(response => {
             setCookie("authToken", response.data.token);
+            setCookie("rft", response.data.rft);
           })
           .catch(console.error);
       }
@@ -63,7 +72,7 @@ export default function Login(props) {
       <form onSubmit={handleSubmit}>
         <Box justify="center" align="center" pad="large">
           <Heading size="large" level={1}>
-            Quiz Masterino
+            Quizzical
           </Heading>
           <Box
             background="dark-1"

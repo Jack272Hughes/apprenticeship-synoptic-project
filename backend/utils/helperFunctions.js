@@ -9,7 +9,7 @@ function createHash(data) {
 function parseCookies(cookies) {
   return cookies.split(/\;\s/).reduce((acc, cookie) => {
     const [key, value] = cookie.split(/\=(.*)/);
-    acc[key] = value;
+    acc[key] = decodeURIComponent(value);
     return acc;
   }, {});
 }

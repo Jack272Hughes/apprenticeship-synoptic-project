@@ -8,7 +8,8 @@ const { createHash, parseCookies } = require("./utils/helperFunctions");
 const {
   generateJWT,
   validateRefreshToken,
-  generateRandomBytes
+  generateRandomBytes,
+  generateRefreshToken
 } = require("./utils/JWTHandling");
 
 app.use(
@@ -41,7 +42,8 @@ app.post("/signup", async (req, res) => {
           username: userData.username,
           role: userData.role,
           oid: userData.oid
-        })
+        }),
+        rft: generateRefreshToken(userData.username)
       });
     });
 });
@@ -60,21 +62,23 @@ app.post("/login", async (req, res) => {
       username: userData.username,
       role: userData.role,
       oid: userData.id
-    })
+    }),
+    rft: generateRefreshToken(userData.username)
   });
 });
 
 app.post("/token", async (req, res) => {
   if (!req.headers.cookie) return res.sendStatus(404);
   const cookies = parseCookies(req.headers.cookie);
-  if (!cookies.authToken) return res.sendStatus(404);
+  if (!cookies.authToken || !cookies.rft) return res.sendStatus(404);
 
-  const hashedRFT = await validateRefreshToken(cookies.authToken);
+  const hashedRFT = await validateRefreshToken(cookies.authToken, cookies.rft);
   if (!hashedRFT) return res.sendStatus(403);
 
   const { username, role, oid } = jwt.decode(cookies.authToken);
   res.json({
-    token: generateJWT({ username, role, oid }, hashedRFT)
+    token: generateJWT({ username, role, oid }),
+    rft: generateRefreshToken(username, hashedRFT)
   });
 });
 
