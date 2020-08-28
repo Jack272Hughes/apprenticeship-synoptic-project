@@ -17,6 +17,24 @@ export default function Login(props) {
     axios.defaults.headers.Authorization = `Bearer ${cookies.authToken}`;
   }, [cookies.authToken]);
 
+  if (
+    cookies.authToken &&
+    cookies.rft &&
+    Math.ceil(Date.now() / 1000) >= jwt.decode(cookies.authToken).exp
+  ) {
+    axios
+      .post("http://localhost:5000/token")
+      .then(response => {
+        setCookie("authToken", response.data.token);
+        setCookie("rft", response.data.rft);
+      })
+      .catch(err => {
+        console.error(err);
+        removeCookie("authToken");
+        removeCookie("rft");
+      });
+  }
+
   const handleSubmit = event => {
     setErrorMsg("");
     event.preventDefault();
@@ -45,6 +63,8 @@ export default function Login(props) {
       });
   };
 
+  // If authToken is set return wrapped JSX and
+  // Inject the authToken and logout function
   return cookies.authToken ? (
     React.cloneElement(props.children, {
       decodedToken: jwt.decode(cookies.authToken),
@@ -56,19 +76,11 @@ export default function Login(props) {
             removeCookie("rft");
             removeCookie("authToken");
           });
-      },
-      acquireTokenSilent: () => {
-        axios
-          .post("http://localhost:5000/token")
-          .then(response => {
-            setCookie("authToken", response.data.token);
-            setCookie("rft", response.data.rft);
-          })
-          .catch(console.error);
       }
     })
   ) : (
-    <div>
+    // If authToken isn't set return the login page
+    <>
       <form onSubmit={handleSubmit}>
         <Box justify="center" align="center" pad="large">
           <Heading size="large" level={1}>
@@ -117,6 +129,6 @@ export default function Login(props) {
           </Box>
         </Box>
       </form>
-    </div>
+    </>
   );
 }
