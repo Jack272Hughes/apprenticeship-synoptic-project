@@ -3,7 +3,7 @@ import { Nav, Anchor, Header, Box } from "grommet";
 
 const items = [
   { label: "Home", href: "/" },
-  { label: "Quizes", href: "/quizes" }
+  { label: "Quizzes", href: "/quizzes" }
 ];
 
 export default function Navbar(props) {

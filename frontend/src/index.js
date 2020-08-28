@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom";
 import "./stylesheets/index.css";
-import Home from "./pages/Home";
+import Routes from "./pages/Router";
 import Login from "./pages/Login";
 import * as serviceWorker from "./serviceWorker";
 import { Grommet, grommet } from "grommet";
@@ -18,7 +18,7 @@ const customTheme = deepMerge(grommet, {
 ReactDOM.render(
   <Grommet theme={customTheme}>
     <Login>
-      <Home />
+      <Routes />
     </Login>
   </Grommet>,
   document.getElementById("root")
