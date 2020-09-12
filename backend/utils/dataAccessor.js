@@ -1,5 +1,5 @@
 const dataAccessor = {};
-const { url, dbName } = require("../config.json");
+const { url, dbName } = require("../config.js");
 const { MongoClient, ObjectId } = require("mongodb");
 
 let client;

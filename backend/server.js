@@ -1,10 +1,9 @@
 const app = require("express")();
 const upload = require("multer")();
 const cors = require("cors");
-const jwt = require("jsonwebtoken");
 const expressJwt = require("express-jwt");
 
-const { jwtSecret } = require("./config.json");
+const { jwtSecret } = require("./config.js");
 const dataAccessor = require("./utils/dataAccessor");
 
 app.use(upload.array());

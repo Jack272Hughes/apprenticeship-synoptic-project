@@ -1,7 +1,7 @@
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 
-const { jwtSecret } = require("../config.json");
+const { jwtSecret } = require("../config.js");
 const dataAccessor = require("./dataAccessor");
 const { createHash } = require("./helperFunctions");
 

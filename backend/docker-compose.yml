@@ -1,0 +1,40 @@
+version: "3.8"
+services:
+  auth:
+    build:
+      context: "./"
+      dockerfile: "authServer.Dockerfile"
+    ports:
+      - "5000:5000"
+    networks:
+      - backend
+    environment:
+      - production=docker
+
+  server:
+    build:
+      context: "./"
+      dockerfile: "server.Dockerfile"
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+    environment:
+      - production=docker
+
+  mongodb:
+    image: mongo
+    restart: always
+    networks:
+      - backend
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+    volumes:
+      - database:/var/lib/mongodb
+
+networks:
+  backend:
+
+volumes:
+  database:
