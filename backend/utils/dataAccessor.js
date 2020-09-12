@@ -1,11 +1,9 @@
 const dataAccessor = {};
 const { url, dbName } = require("../config.json");
+const { MongoClient, ObjectId } = require("mongodb");
 
 let client;
-const mongoClient = new require("mongodb")
-  .MongoClient(url, {
-    useUnifiedTopology: true
-  })
+new MongoClient(url, { useUnifiedTopology: true })
   .connect()
   .then(connection => (client = connection))
   .catch(console.error);
@@ -29,7 +27,6 @@ function collectionQueryAsPromise(
     });
   }).catch(err => {
     console.error(err);
-    console.log("Error got here");
   });
 }
 
@@ -51,16 +48,24 @@ function extractId(rowObject) {
   return rest;
 }
 
-function findFromCollection(collection, query, options) {
-  return collectionQueryAsPromise(
-    collection,
-    options.findOne ? "findOne" : "find",
-    query,
-    result => {
-      if (!result) return null;
-      else return options.findOne ? extractId(result) : result.map(extractId);
-    }
-  );
+function findOneFromCollection(collection, query) {
+  return collectionQueryAsPromise(collection, "findOne", query, result => {
+    if (!result) return null;
+    else return extractId(result);
+  });
+}
+
+function findManyFromCollection(collection, query) {
+  return new Promise(async (resolve, reject) => {
+    getConnection(collection)
+      .find(query)
+      .toArray((err, result) => {
+        if (err) return reject(err);
+        resolve(result.map(extractId));
+      });
+  }).catch(err => {
+    console.error(err);
+  });
 }
 
 dataAccessor.refreshTokens = {
@@ -87,11 +92,7 @@ dataAccessor.refreshTokens = {
     }).catch(console.error);
   },
   validate: (token, username) => {
-    return findFromCollection(
-      "refreshTokens",
-      { token, username },
-      { findOne: true }
-    );
+    return findOneFromCollection("refreshTokens", { token, username });
   }
 };
 
@@ -105,7 +106,36 @@ dataAccessor.users = {
     });
   },
   find: username => {
-    return findFromCollection("users", { username }, { findOne: true });
+    return findOneFromCollection("users", { username }, { findOne: true });
+  }
+};
+
+dataAccessor.quizzes = {
+  all: () => {
+    return findManyFromCollection("quizzes", {});
+  },
+  add: (userOid, name, description) => {
+    return insertToCollection("quizzes", { userOid, name, description });
+  }
+};
+
+dataAccessor.questions = {
+  all: quizId => {
+    return findManyFromCollection("questions", {
+      quizId: new ObjectId(quizId)
+    });
+  },
+  add: (quizId, name) => {
+    return insertToCollection("questions", { name, quizId });
+  }
+};
+
+dataAccessor.answers = {
+  all: questionId => {
+    return findManyFromCollection("answers", { questionId });
+  },
+  add: (questionId, correct) => {
+    return insertToCollection("answers", { questionId, correct });
   }
 };
 
