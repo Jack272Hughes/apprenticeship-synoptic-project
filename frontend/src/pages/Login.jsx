@@ -13,9 +13,7 @@ export default function Login(props) {
   const [errorMsg, setErrorMsg] = React.useState("");
   const [signingUp, setSigningup] = React.useState(false);
 
-  React.useEffect(() => {
-    axios.defaults.headers.Authorization = `Bearer ${cookies.authToken}`;
-  }, [cookies.authToken]);
+  axios.defaults.headers.Authorization = `Bearer ${cookies.authToken}`;
 
   if (
     cookies.authToken &&
