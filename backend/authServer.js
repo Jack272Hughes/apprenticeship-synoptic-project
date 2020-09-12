@@ -3,7 +3,7 @@ const upload = require("multer")();
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 
-const dataAccessor = require("./dataAccessor/dataAccessor");
+const dataAccessor = require("./utils/dataAccessor");
 const { createHash, parseCookies } = require("./utils/helperFunctions");
 const {
   generateJWT,
@@ -85,13 +85,11 @@ app.post("/token", async (req, res) => {
 app.post("/logout", (req, res) => {
   if (!req.headers.cookie) return res.sendStatus(404);
   const cookies = parseCookies(req.headers.cookie);
-  if (!cookies.authToken) return res.sendStatus(404);
+  if (!cookies.rft) return res.sendStatus(404);
 
   const decodedToken = jwt.decode(cookies.authToken);
-  if (!decodedToken.rft) return res.sendStatus(200);
-
   dataAccessor.refreshTokens.remove(
-    createHash(decodedToken.rft),
+    createHash(cookies.rft),
     decodedToken.username
   );
   res.sendStatus(200);
