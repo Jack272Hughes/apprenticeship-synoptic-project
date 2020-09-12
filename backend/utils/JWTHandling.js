@@ -2,7 +2,7 @@ const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
 
 const { jwtSecret } = require("../config.json");
-const dataAccessor = require("../dataAccessor/dataAccessor");
+const dataAccessor = require("./dataAccessor");
 const { createHash } = require("./helperFunctions");
 
 function generateRefreshToken(username, oldRft) {
