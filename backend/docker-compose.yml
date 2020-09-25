@@ -1,9 +1,7 @@
 version: "3.8"
 services:
   auth:
-    build:
-      context: "./"
-      dockerfile: "authServer.Dockerfile"
+    build: "./service"
     ports:
       - "5000:5000"
     networks:
@@ -12,9 +10,7 @@ services:
       - production=docker
 
   server:
-    build:
-      context: "./"
-      dockerfile: "server.Dockerfile"
+    build: "./server"
     ports:
       - "8080:8080"
     networks:

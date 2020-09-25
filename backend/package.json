@@ -8,11 +8,11 @@
     "multer": "^1.4.2"
   },
   "scripts": {
-    "start:auth": "node authServer.js",
-    "start:server": "node server.js",
-    "docker:build": "docker-compose build",
+    "start:auth": "node service/authServer.js",
+    "start:server": "node server/server.js",
+    "docker:build": "docker build -t backend_base:latest ./ && docker-compose build",
     "docker:start": "docker-compose up -d",
     "docker:stop": "docker-compose stop",
-    "docker:remove": "docker-compose down && docker rmi backend_server backend_auth"
+    "docker:remove": "docker-compose down && docker rmi backend_base backend_server backend_auth"
   }
 }

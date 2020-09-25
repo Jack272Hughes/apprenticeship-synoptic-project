@@ -18,7 +18,7 @@ export default function Login(props) {
   if (
     cookies.authToken &&
     cookies.rft &&
-    Math.ceil(Date.now() / 1000) >= jwt.decode(cookies.authToken).exp
+    Math.ceil(Date.now() / 1000) >= jwt.decode(cookies.authToken).exp - 300
   ) {
     axios
       .post("http://localhost:5000/token")

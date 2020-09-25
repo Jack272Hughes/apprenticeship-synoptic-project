@@ -3,8 +3,8 @@ const upload = require("multer")();
 const cors = require("cors");
 const expressJwt = require("express-jwt");
 
-const { jwtSecret } = require("./config.js");
-const dataAccessor = require("./utils/dataAccessor");
+const { jwtSecret } = require("../config.js");
+const dataAccessor = require("../utils/dataAccessor");
 
 app.use(upload.array());
 app.use(

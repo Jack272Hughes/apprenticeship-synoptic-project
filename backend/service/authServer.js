@@ -3,14 +3,14 @@ const upload = require("multer")();
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
 
-const dataAccessor = require("./utils/dataAccessor");
-const { createHash, parseCookies } = require("./utils/helperFunctions");
+const dataAccessor = require("../utils/dataAccessor");
+const { createHash, parseCookies } = require("../utils/helperFunctions");
 const {
   generateJWT,
   validateRefreshToken,
   generateRandomBytes,
   generateRefreshToken
-} = require("./utils/JWTHandling");
+} = require("../utils/JWTHandling");
 
 app.use(
   cors({
