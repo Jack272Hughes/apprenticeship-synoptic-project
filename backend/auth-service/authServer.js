@@ -95,4 +95,6 @@ app.post("/logout", (req, res) => {
   res.sendStatus(200);
 });
 
-app.listen(5000);
+if (process.env.NODE_ENV !== "test") app.listen(5000);
+
+module.exports = app;
