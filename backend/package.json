@@ -10,7 +10,7 @@
     "supertest": "^6.0.1"
   },
   "scripts": {
-    "start:auth": "node service/authServer.js",
+    "start:auth": "node auth-service/authServer.js",
     "start:server": "node server/server.js",
     "docker:build": "docker build -t backend_base:latest ./ && docker-compose build",
     "docker:start": "docker-compose up -d",
@@ -21,7 +21,8 @@
   "jest": {
     "setupFilesAfterEnv": [
       "./mocks/mongoMock.js",
-      "./mocks/dataAccessorMock.js"
+      "./mocks/dataAccessorMock.js",
+      "./mocks/helperFunctionsMock.js"
     ]
   }
 }

@@ -1,4 +1,5 @@
-const app = require("express")();
+const express = require("express");
+const app = express();
 const upload = require("multer")();
 const cors = require("cors");
 const jwt = require("jsonwebtoken");
@@ -19,6 +20,7 @@ app.use(
   })
 );
 app.use(upload.array());
+app.use(express.json());
 
 app.post("/signup", async (req, res) => {
   if (!req.body || !req.body.username || !req.body.password)
