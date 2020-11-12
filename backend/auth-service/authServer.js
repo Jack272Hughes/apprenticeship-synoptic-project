@@ -33,7 +33,7 @@ app.post("/signup", async (req, res) => {
   dataAccessor.users
     .add(req.body.username, createHash(req.body.password + salt), salt)
     .then(result => {
-      if (!result) return res.sendStatus(409);
+      if (!result) return res.sendStatus(500);
       const userData = {
         ...result.ops[0],
         oid: result.insertedId
@@ -55,7 +55,7 @@ app.post("/login", async (req, res) => {
     return res.sendStatus(404);
   const userData = await dataAccessor.users.find(req.body.username);
 
-  if (!userData) return res.sendStatus(401);
+  if (!userData) return res.sendStatus(404);
   if (createHash(req.body.password + userData.salt) !== userData.password)
     return res.sendStatus(401);
 
