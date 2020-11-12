@@ -1,23 +1,26 @@
 const dataAccessor = require("../utils/dataAccessor");
 
-dataAccessor.testFunctions = {
-  mockOnce: jest.fn(),
-  mockPersist: jest.fn(),
-  mockResetLast: jest.fn(),
-  mockParameters: jest.fn()
-};
-
-mockDataAccessor("testFunctions.mockResetLast", "notResetAfterEach", {
-  resetLast: true
-});
-
-afterAll(() => delete dataAccessor.testFunctions);
-
+// Testing of the global mockDataAccessor helper function
 describe("When testing the mockDataAccessor function it", () => {
+  beforeAll(() => {
+    dataAccessor.testFunctions = {
+      mockOnce: jest.fn(),
+      mockPersist: jest.fn(),
+      mockResetLast: jest.fn(),
+      mockParameters: jest.fn()
+    };
+
+    mockDataAccessor("testFunctions.mockResetLast", "notResetAfterEach", {
+      resetLast: true
+    });
+  });
+
+  afterAll(() => delete dataAccessor.testFunctions);
+
   it("Should be able to mock the resolved value of a function once", async () => {
     mockDataAccessor("testFunctions.mockOnce", "resolvedValue");
 
-    dataAccessor.testFunctions
+    await dataAccessor.testFunctions
       .mockOnce()
       .then(response => expect(response).toBe("resolvedValue"));
 
@@ -31,7 +34,7 @@ describe("When testing the mockDataAccessor function it", () => {
       reject: true
     });
 
-    dataAccessor.testFunctions
+    await dataAccessor.testFunctions
       .mockOnce()
       .catch(response => expect(response).toBe("rejectedValue"));
 
@@ -40,15 +43,16 @@ describe("When testing the mockDataAccessor function it", () => {
     }).toThrow("Cannot read property 'catch' of undefined");
   });
 
-  it("Should be able to mock a function more than once with option 'persist'", () => {
+  it("Should be able to mock a function more than once with option 'persist'", done => {
     mockDataAccessor("testFunctions.mockPersist", "persistentValue", {
       persist: true
     });
 
     for (let times = 0; times < 2; times++) {
-      dataAccessor.testFunctions
-        .mockPersist()
-        .then(response => expect(response).toBe("persistentValue"));
+      dataAccessor.testFunctions.mockPersist().then(response => {
+        expect(response).toBe("persistentValue");
+        done();
+      });
     }
   });
 
@@ -63,9 +67,21 @@ describe("When testing the mockDataAccessor function it", () => {
     });
   });
 
-  it("Should be able to mock a function until the end of ALL tests with option 'resetLast'", () => {
-    dataAccessor.testFunctions
-      .mockResetLast()
-      .then(response => expect(response).toBe("notResetAfterEach"));
+  it("Should still be able to mock a function that was previously mocked as 'resetLast'", done => {
+    mockDataAccessor("testFunctions.mockResetLast", "resetAfterEach");
+    dataAccessor.testFunctions.mockResetLast.mockResolvedValueOnce(
+      "resetAfterEach"
+    );
+    dataAccessor.testFunctions.mockResetLast().then(response => {
+      expect(response).toBe("resetAfterEach");
+      done();
+    });
+  });
+
+  it("Should be able to mock a function with a specific value until the end of ALL tests with option 'resetLast'", done => {
+    dataAccessor.testFunctions.mockResetLast().then(response => {
+      expect(response).toBe("notResetAfterEach");
+      done();
+    });
   });
 });

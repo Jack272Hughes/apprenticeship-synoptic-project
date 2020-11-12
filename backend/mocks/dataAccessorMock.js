@@ -3,15 +3,28 @@ const dataAccessor = require("../utils/dataAccessor");
 
 let functionsToReset = [];
 let functionsToResetLast = [];
+let globalFunctionValues = {};
 
 afterEach(() => {
-  functionsToReset.forEach(mockedFunction => mockedFunction.mockReset());
+  functionsToReset.forEach(mockedFunction => {
+    mockedFunction.mockReset();
+    // Checks to see if this function has a globally set value from 'resetLast' option
+    // And resets it back to that instead
+    if (functionsToResetLast.includes(mockedFunction)) {
+      const globalValueObject = globalFunctionValues[mockedFunction.name];
+      mockedFunction[globalValueObject.mockFunctionType](
+        globalValueObject.returnedValue
+      );
+    }
+  });
+  functionsToResetLast.forEach(mockedFunction => mockedFunction.mockClear());
   functionsToReset = [];
 });
 
 afterAll(() => {
   functionsToResetLast.forEach(mockedFunction => mockedFunction.mockReset());
   functionsToResetLast = [];
+  globalFunctionValues = {};
 });
 
 /*
@@ -30,7 +43,7 @@ afterAll(() => {
   leading to the function always returning that value until it moves onto the next test
 
   If options contain { resetLast: true } then it will only reset the mocked function after all tests in a file
-  have been finished
+  have been finished but will still clear function calls between tests.
 */
 global.mockDataAccessor = (functionRoute, returnedValue, options = {}) => {
   accessorFunction = functionRoute
@@ -43,10 +56,15 @@ global.mockDataAccessor = (functionRoute, returnedValue, options = {}) => {
   let mockFunctionType = options.reject
     ? "mockRejectedValue"
     : "mockResolvedValue";
-  if (!options.persist) mockFunctionType += "Once";
+  if (!options.persist && !options.resetLast) mockFunctionType += "Once";
 
   accessorFunction[mockFunctionType](returnedValue);
 
-  if (options.resetLast) functionsToResetLast.push(accessorFunction);
-  else functionsToReset.push(accessorFunction);
+  if (options.resetLast) {
+    functionsToResetLast.push(accessorFunction);
+    globalFunctionValues[accessorFunction.name] = {
+      returnedValue,
+      mockFunctionType
+    };
+  } else functionsToReset.push(accessorFunction);
 };
