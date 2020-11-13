@@ -1,17 +1,33 @@
 const jwtHandling = require("../utils/JWTHandling");
 const helperFunctions = require("../utils/helperFunctions");
+const jwt = require("jsonwebtoken");
 
 jest.mock("../utils/JWTHandling");
+jest.mock("../utils/helperFunctions");
+jest.mock("jsonwebtoken");
 
-jwtHandling.generateRandomBytes.mockReturnValue("randomBytes");
-jwtHandling.generateJWT.mockReturnValue("generatedJWT");
-jwtHandling.generateRefreshToken.mockReturnValue("generatedRFT");
+Object.entries(jwtHandling).forEach(([functionName, functionActual]) => {
+  functionActual.mockReturnValue(
+    functionName
+      .replace("generate", "generated")
+      .replace("validate", "validated")
+  );
+});
 
-helperFunctions.createHash = jest.fn(() => "createdHash");
+helperFunctions.createHash.mockReturnValue("createdHash");
+helperFunctions.parseCookies.mockReturnValue({
+  authToken: "mockAuthToken",
+  rft: "mockRefreshToken"
+});
+
+jwt.decode.mockReturnValue({
+  username: "username",
+  role: "mockedRole",
+  oid: 0
+});
 
 beforeEach(() => {
-  jwtHandling.generateRandomBytes.mockClear();
-  jwtHandling.generateJWT.mockClear();
-  jwtHandling.generateRefreshToken.mockClear();
-  helperFunctions.createHash.mockClear();
+  Object.values(jwtHandling).forEach(func => func.mockClear());
+  Object.values(helperFunctions).forEach(func => func.mockClear());
+  jwt.decode.mockClear();
 });

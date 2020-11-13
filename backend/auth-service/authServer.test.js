@@ -5,6 +5,8 @@ const jwtHandling = require("../utils/JWTHandling.js");
 const helperFunctions = require("../utils/helperFunctions.js");
 const dataAccessor = require("../utils/dataAccessor");
 
+const jwt = require("jsonwebtoken");
+
 let app, request;
 const basicLogin = { username: "username", password: "password" };
 
@@ -13,7 +15,7 @@ afterAll(() => {
 });
 
 beforeAll(() => {
-  mockDataAccessor("users.find", false, { persist: true, resetLast: true });
+  mockDataAccessor("users.find", false, { resetLast: true });
 });
 
 describe("When running the authServer it", () => {
@@ -58,7 +60,9 @@ describe("When calling the /signup route it", () => {
     await request.post("/signup").send(basicLogin);
 
     expect(jwtHandling.generateRandomBytes).toBeCalled();
-    expect(helperFunctions.createHash).toBeCalledWith("passwordrandomBytes");
+    expect(helperFunctions.createHash).toBeCalledWith(
+      "passwordgeneratedRandomBytes"
+    );
     expect(jwtHandling.generateJWT).toBeCalledWith({
       oid: 0,
       role: "mockedRole",
@@ -78,7 +82,7 @@ describe("When calling the /signup route it", () => {
     expect(dataAccessor.users.add).toBeCalledWith(
       "username",
       "createdHash",
-      "randomBytes"
+      "generatedRandomBytes"
     );
   });
 
@@ -88,7 +92,7 @@ describe("When calling the /signup route it", () => {
     const response = await request.post("/signup").send(basicLogin);
     expect(response.body).toMatchObject({
       token: "generatedJWT",
-      rft: "generatedRFT"
+      rft: "generatedRefreshToken"
     });
   });
 });
@@ -138,7 +142,82 @@ describe("When calling the /login route it", () => {
     const response = await request.post("/login").send(basicLogin);
     expect(response.body).toMatchObject({
       token: "generatedJWT",
-      rft: "generatedRFT"
+      rft: "generatedRefreshToken"
     });
+  });
+});
+
+describe("When calling the /token route it", () => {
+  it("Should return a 404 status when no cookie header is sent", done => {
+    request.post("/token").expect(404, done);
+  });
+
+  it("Should return a 404 status when no authToken or rft token exists", done => {
+    helperFunctions.parseCookies.mockReturnValueOnce({});
+    request.post("/token").set("cookie", "mockCookie").expect(404, done);
+  });
+
+  it("Should return a 403 status when invalid refresh token is received", done => {
+    jwtHandling.validateRefreshToken.mockReturnValueOnce(null);
+    request.post("/token").set("cookie", "mockCookie").expect(403, done);
+  });
+
+  it("Should call correct helper functions with correct parameters", async () => {
+    await request.post("/token").set("cookie", "mockCookie").send(basicLogin);
+
+    expect(helperFunctions.parseCookies).toBeCalledWith("mockCookie");
+    expect(jwtHandling.validateRefreshToken).toBeCalledWith(
+      "mockAuthToken",
+      "mockRefreshToken"
+    );
+    expect(jwt.decode).toBeCalledWith("mockAuthToken");
+    expect(jwtHandling.generateJWT).toBeCalledWith({
+      oid: 0,
+      role: "mockedRole",
+      username: "username"
+    });
+    expect(jwtHandling.generateRefreshToken).toBeCalledWith(
+      "username",
+      "validatedRefreshToken"
+    );
+  });
+
+  it("Should return a JWT and RFT token on success", async () => {
+    const response = await request
+      .post("/token")
+      .set("cookie", "mockCookie")
+      .send(basicLogin);
+
+    expect(response.body).toMatchObject({
+      token: "generatedJWT",
+      rft: "generatedRefreshToken"
+    });
+  });
+});
+
+describe("When calling the /logout route it", () => {
+  it("Should return a 404 status when no cookie header is sent", done => {
+    request.post("/logout").expect(404, done);
+  });
+
+  it("Should return a 404 status when no rft token exists", done => {
+    helperFunctions.parseCookies.mockReturnValueOnce({});
+    request.post("/logout").set("cookie", "mockCookie").expect(404, done);
+  });
+
+  it("Should call correct helper functions with correct parameters", async () => {
+    await request.post("/logout").set("cookie", "mockCookie").send(basicLogin);
+
+    expect(helperFunctions.parseCookies).toBeCalledWith("mockCookie");
+    expect(jwt.decode).toBeCalledWith("mockAuthToken");
+    expect(dataAccessor.refreshTokens.remove).toBeCalledWith(
+      "createdHash",
+      "username"
+    );
+    expect(helperFunctions.createHash).toBeCalledWith("mockRefreshToken");
+  });
+
+  it("Should return a 200 status on success", done => {
+    request.post("/logout").set("cookie", "mockCookie").expect(200, done);
   });
 });
