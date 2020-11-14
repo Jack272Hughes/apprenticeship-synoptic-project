@@ -1,5 +1,5 @@
 import React from "react";
-import axios from "axios";
+import axiosInstance from "../components/axiosInstance";
 import { useHistory } from "react-router-dom";
 
 import { Card, CardHeader, CardBody, Heading, Box } from "grommet";
@@ -9,8 +9,8 @@ export default function Quizzes(props) {
   const history = useHistory();
 
   React.useEffect(() => {
-    axios
-      .get("http://localhost:8080/quizzes")
+    axiosInstance
+      .get("/quizzes")
       .then(response => {
         setQuizzes(response.data.quizzes);
       })

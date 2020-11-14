@@ -5,7 +5,10 @@ const { MongoClient, ObjectId } = require("mongodb");
 let client;
 new MongoClient(url, { useUnifiedTopology: true })
   .connect()
-  .then(connection => (client = connection))
+  .then(connection => {
+    console.log("Connected to MongoDB");
+    client = connection;
+  })
   .catch(console.error);
 
 function getConnection(collection) {

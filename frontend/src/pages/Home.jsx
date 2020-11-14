@@ -1,11 +1,11 @@
 import React from "react";
-import axios from "axios";
+import { axiosInstance } from "../components";
 import { Box } from "grommet";
 
 import "../stylesheets/home.css";
 
 function Home(props) {
-  axios.get("http://localhost:8080/quizzes").then(res => {
+  axiosInstance.get("/quizzes").then(res => {
     console.log(res.data.quizzes);
   });
 
