@@ -1,8 +1,7 @@
 import React from "react";
 import { Switch, Route, BrowserRouter as Router } from "react-router-dom";
-import { Button } from "grommet";
 
-import Navbar from "../components/Navbar";
+import { Navbar } from "../components";
 import HomePage from "./Home";
 import AllQuizzesPage from "./Quizzes";
 import { QuizHandler } from "./QuizPages";
@@ -13,7 +12,6 @@ export default function Routes(props) {
 
   return (
     <>
-      <Button onClick={props.getNewToken} />
       <Router>
         <Navbar username={decodedToken.username} logout={logout} />
         <Switch>

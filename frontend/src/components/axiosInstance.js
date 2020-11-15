@@ -2,8 +2,8 @@ const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const config = require("../config");
 
-let setCookie;
-let removeCookie;
+let setCookies;
+let removeCookies;
 
 const serverInstance = axios.create({
   baseURL: config.serverHost,
@@ -17,22 +17,26 @@ const authInstance = axios.create({
 
 function getNewToken() {
   return authInstance.post("/token").catch(err => {
-    console.error(err);
-    if (err.response && err.response.status === 403) {
-      removeCookie("authToken");
-      removeCookie("rft");
-    }
+    console.log(err);
+    removeCookies(["authToken", "rft"]);
   });
 }
 
+function setAuth(token, setCookiesFunc, removeCookiesFunc) {
+  serverInstance.defaults.headers.common.Authorization = `Bearer ${token}`;
+  setCookies = setCookiesFunc;
+  removeCookies = removeCookiesFunc;
+}
+
 serverInstance.interceptors.request.use(async req => {
+  if (!req.headers.common.Authorization)
+    throw new axios.Cancel("No Authorizarion header found");
   const decodedToken = jwt.decode(req.headers.common.Authorization.slice(7));
-  if (Math.ceil(Date.now() / 1000) >= decodedToken.exp - 45) {
+  if (Math.ceil(Date.now() / 1000) >= decodedToken.exp - 300) {
     await getNewToken().then(response => {
       const { token, rft } = response.data;
       req.headers.common.Authorization = `Bearer ${token}`;
-      setCookie("authToken", token);
-      setCookie("rft", rft);
+      setCookies({ authToken: token, rft });
     });
   }
   return req;
@@ -48,11 +52,7 @@ module.exports = {
   post: requestGenerator(serverInstance, "post"),
   patch: requestGenerator(serverInstance, "patch"),
   delete: requestGenerator(serverInstance, "delete"),
-  setAuth: (token, setCookieFunc, removeCookieFunc) => {
-    setCookie = setCookieFunc;
-    removeCookie = removeCookieFunc;
-    serverInstance.defaults.headers.common.Authorization = `Bearer ${token}`;
-  },
   postAuth: requestGenerator(authInstance, "post"),
+  setAuth,
   getNewToken
 };

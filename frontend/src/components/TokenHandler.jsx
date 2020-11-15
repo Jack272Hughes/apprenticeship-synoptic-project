@@ -1,17 +1,21 @@
 import React from "react";
-import { useCookies } from "react-cookie";
 import jwt from "jsonwebtoken";
 
-import { axiosInstance } from "./";
+import { axiosInstance, useCookies } from "./";
 import Login from "../pages/Login";
+import { setAuth } from "./axiosInstance";
 
 export default function TokenHandler(props) {
-  const [cookies, setCookie, removeCookie] = useCookies(["authToken", "rft"]);
+  const [cookies, setCookies, removeCookies] = useCookies(["authToken", "rft"]);
   const [errorMsg, setErrorMsg] = React.useState("");
   const [signingUp, setSigningup] = React.useState(false);
 
-  if (cookies.authToken) {
-    axiosInstance.setAuth(cookies.authToken, setCookie, removeCookie);
+  const decodedToken = jwt.decode(cookies.authToken);
+
+  if (cookies.authToken && cookies.rft) {
+    setAuth(cookies.authToken, setCookies, removeCookies);
+  } else {
+    removeCookies("authToken", "rft");
   }
 
   const handleSubmit = event => {
@@ -21,8 +25,7 @@ export default function TokenHandler(props) {
     axiosInstance
       .postAuth(signingUp ? "signup" : "login", data)
       .then(response => {
-        setCookie("authToken", response.data.token);
-        setCookie("rft", response.data.rft);
+        setCookies({ authToken: response.data.token, rft: response.data.rft });
       })
       .catch(err => {
         if (!err.response) return setErrorMsg("Something went wrong");
@@ -46,14 +49,14 @@ export default function TokenHandler(props) {
   // Inject the authToken and logout function
   return cookies.authToken ? (
     React.cloneElement(props.children, {
-      decodedToken: jwt.decode(cookies.authToken),
+      getNewToken: axiosInstance.getNewToken,
+      decodedToken: decodedToken,
       logout: () => {
         axiosInstance
           .postAuth("/logout")
           .catch(console.error)
           .finally(() => {
-            removeCookie("rft");
-            removeCookie("authToken");
+            removeCookies(["rft", "authToken"]);
           });
       }
     })

@@ -43,10 +43,12 @@ app.get("/quizzes/:quizId/questions", (req, res) => {
 app.post("/quizzes/:quizId/check", (req, res) => {
   const quizId = req.params.quizId;
   const { answers: userAnswers } = req.body;
+  if (JSON.stringify(userAnswers) === "{}") return res.sendStatus(404);
+
   dataAccessor.questions.answers.correct(quizId).then(actualAnswers => {
     let result = { total: 0, correct: 0 };
 
-    actualAnswers.forEach(({ questionId, answers }) => {
+    actualAnswers.forEach(({ id: questionId, answers }) => {
       let userAnswer = userAnswers[questionId];
       if (!Array.isArray(userAnswer)) userAnswer = [userAnswer];
 
