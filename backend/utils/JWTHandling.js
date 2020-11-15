@@ -18,7 +18,7 @@ function generateRandomBytes(totalBytes = 16) {
 }
 
 function generateJWT(userObject) {
-  const { username, role = "user", oid } = userObject;
+  const { username, role = "USER", oid } = userObject;
   return (token = jwt.sign({ oid, username, role }, jwtSecret, {
     expiresIn: "30m"
   }));

@@ -26,6 +26,13 @@ app.get("/quizzes", (req, res) => {
   });
 });
 
+app.get("/quizzes/:quizId", (req, res) => {
+  const quizId = req.params.quizId;
+  dataAccessor.quizzes.get(quizId).then(quiz => {
+    res.json({ quiz: quiz[0] });
+  });
+});
+
 app.get("/quizzes/:quizId/questions", (req, res) => {
   const quizId = req.params.quizId;
   dataAccessor.questions.all(quizId).then(questions => {
@@ -36,12 +43,16 @@ app.get("/quizzes/:quizId/questions", (req, res) => {
 app.post("/quizzes/:quizId/check", (req, res) => {
   const quizId = req.params.quizId;
   const { answers: userAnswers } = req.body;
-  dataAccessor.answers.allCorrect(quizId).then(actualAnswers => {
+  dataAccessor.questions.answers.correct(quizId).then(actualAnswers => {
     let result = { total: 0, correct: 0 };
+
     actualAnswers.forEach(({ questionId, answers }) => {
+      let userAnswer = userAnswers[questionId];
+      if (!Array.isArray(userAnswer)) userAnswer = [userAnswer];
+
       answers.forEach(answer => {
         result.total++;
-        if (userAnswers[questionId].includes(answer)) result.correct++;
+        if (userAnswer.includes(answer)) result.correct++;
       });
     });
     res.json(result);

@@ -49,52 +49,36 @@ client
               const questionId = dataObj.insertedId;
               db.collection("questions")
                 .insertMany([
-                  { quizId: questionId, name: "What is 2 + 2?" },
-                  { quizId: questionId, name: "What is 4 x 6?" },
                   {
                     quizId: questionId,
-                    name: "Which answers will result in 16?"
+                    name: "What is 2 + 2?",
+                    type: "radio",
+                    answers: [
+                      { correct: true, value: "4" },
+                      { correct: false, value: "8" }
+                    ]
+                  },
+                  {
+                    quizId: questionId,
+                    name: "What is 4 x 6?",
+                    type: "radio",
+                    answers: [
+                      { correct: true, value: "24" },
+                      { correct: false, value: "26" }
+                    ]
+                  },
+                  {
+                    quizId: questionId,
+                    name: "Which answers will result in 16?",
+                    type: "checkbox",
+                    answers: [
+                      { correct: true, value: "4 x 4" },
+                      { correct: true, value: "8 x 2" },
+                      { correct: false, value: "6 x 2" }
+                    ]
                   }
                 ])
-                .then(questionObjs => {
-                  const [
-                    firstQuestion,
-                    secondQuestion,
-                    thirdQuestion
-                  ] = questionObjs.ops.map(el => el._id.toString());
-
-                  db.collection("answers")
-                    .insertMany([
-                      { questionId: firstQuestion, correct: true, value: "4" },
-                      {
-                        questionId: secondQuestion,
-                        correct: true,
-                        value: "24"
-                      },
-                      {
-                        questionId: secondQuestion,
-                        correct: false,
-                        value: "26"
-                      },
-                      {
-                        questionId: thirdQuestion,
-                        correct: true,
-                        value: "4 x 4"
-                      },
-                      {
-                        questionId: thirdQuestion,
-                        correct: true,
-                        value: "8 x 2"
-                      },
-                      {
-                        questionId: thirdQuestion,
-                        correct: false,
-                        value: "6 x 2"
-                      }
-                    ])
-                    .then(() => resolve())
-                    .catch(err => reject(err));
-                })
+                .then(() => resolve())
                 .catch(err => reject(err));
             })
             .catch(err => reject(err));

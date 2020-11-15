@@ -131,6 +131,43 @@ dataAccessor.quizzes = {
   },
   add: (userOid, name, description) => {
     return insertToCollection("quizzes", { userOid, name, description });
+  },
+  get: quizId => {
+    return aggregateManyFromCollection("quizzes", [
+      { $match: { _id: ObjectId(quizId) } },
+      {
+        $lookup: {
+          from: "questions",
+          localField: "_id",
+          foreignField: "quizId",
+          as: "questions"
+        }
+      },
+      {
+        $project: {
+          name: 1,
+          description: 1,
+          totalQuestions: { $size: "$questions" },
+          maximumScore: {
+            $sum: {
+              $map: {
+                input: "$questions",
+                as: "question",
+                in: {
+                  $size: {
+                    $filter: {
+                      input: "$$question.answers",
+                      as: "answer",
+                      cond: { $eq: ["$$answer.correct", true] }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    ]);
   }
 };
 
@@ -138,30 +175,35 @@ dataAccessor.questions = {
   all: quizId => {
     return aggregateManyFromCollection("questions", [
       { $match: { quizId: ObjectId(quizId) } },
-      {
-        $lookup: {
-          from: "answers",
-          let: { question_id: "$_id" },
-          pipeline: [
-            { $match: { $expr: { $eq: ["$questionId", "$$question_id"] } } },
-            { $project: { correct: 0 } }
-          ],
-          as: "answers"
-        }
-      }
+      { $project: { "answers.correct": 0, quizId: 0 } }
     ]);
   },
-  add: (quizId, name) => {
-    return insertToCollection("questions", { name, quizId });
-  }
-};
-
-dataAccessor.answers = {
-  allCorrect: () => {
-    return new Promise(resolve => resolve());
+  add: (quizId, name, answers) => {
+    return insertToCollection("questions", { name, quizId, answers });
   },
-  add: (questionId, correct) => {
-    return insertToCollection("answers", { questionId, correct });
+  answers: {
+    correct: quizId => {
+      return aggregateManyFromCollection("questions", [
+        { $match: { quizId: ObjectId(quizId) } },
+        {
+          $project: {
+            answers: {
+              $map: {
+                input: {
+                  $filter: {
+                    input: "$answers",
+                    as: "answer",
+                    cond: { $eq: ["$$answer.correct", true] }
+                  }
+                },
+                as: "answer",
+                in: "$$answer.value"
+              }
+            }
+          }
+        }
+      ]);
+    }
   }
 };
 

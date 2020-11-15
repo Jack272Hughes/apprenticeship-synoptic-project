@@ -39,6 +39,23 @@ describe("When calling the route GET /quizzes it", () => {
   });
 });
 
+describe("When calling the route GET /quizzes/1 it", () => {
+  const mockQuiz = [{ name: "quiz1" }];
+
+  beforeEach(() => {
+    mockDataAccessor("quizzes.get", mockQuiz);
+  });
+
+  it("Should call dataAccessor.quizzes.get function", async () => {
+    await request.get("/quizzes/1");
+    expect(dataAccessor.quizzes.get).toBeCalledWith("1");
+  });
+
+  it("Should return all correct quizzes in an object", done => {
+    request.get("/quizzes/1").expect(200, { quiz: mockQuiz[0] }, done);
+  });
+});
+
 describe("When calling the route GET /quizzes/:quizId/questions it", () => {
   const mockQuestions = [{ name: "question1" }, { name: "question2" }];
 
@@ -65,14 +82,14 @@ describe("When calling the route POST /quizzes/1/check it", () => {
   ];
 
   beforeEach(() => {
-    mockDataAccessor("answers.allCorrect", mockCorrectAnswers);
+    mockDataAccessor("questions.answers.correct", mockCorrectAnswers);
   });
 
-  it("Should call dataAccessor.answers.allCorrect function with correct parameter", async () => {
+  it("Should call dataAccessor.questions.answers.correct function with correct parameter", async () => {
     await request
       .post("/quizzes/1/check")
       .send({ answers: { radio: [], checkbox: [] } });
-    expect(dataAccessor.answers.allCorrect).toBeCalledWith("1");
+    expect(dataAccessor.questions.answers.correct).toBeCalledWith("1");
   });
 
   it("Should return maximum total and total correct", done => {
@@ -80,7 +97,7 @@ describe("When calling the route POST /quizzes/1/check it", () => {
       .post("/quizzes/1/check")
       .send({
         answers: {
-          radio: ["a"],
+          radio: "a",
           checkbox: ["b", "e"]
         }
       })
