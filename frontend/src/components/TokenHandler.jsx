@@ -11,7 +11,7 @@ export default function TokenHandler(props) {
   const [signingUp, setSigningup] = React.useState(false);
 
   if (cookies.authToken) {
-    axiosInstance.setAuth(cookies.authToken, setCookie);
+    axiosInstance.setAuth(cookies.authToken, setCookie, removeCookie);
   }
 
   const handleSubmit = event => {
