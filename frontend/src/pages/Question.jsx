@@ -1,6 +1,6 @@
 import React from "react";
 import { axiosInstance } from "../components";
-import { Box, Heading } from "grommet";
+import { Box, Heading, CheckBoxGroup, RadioButtonGroup } from "grommet";
 
 export default function Question(props) {
   const [questions, setQuestions] = React.useState([]);
@@ -9,7 +9,6 @@ export default function Question(props) {
     axiosInstance
       .get(`/quizzes/${props.quizId}/questions`)
       .then(response => {
-        console.log(response.data.questions);
         setQuestions(response.data.questions);
       })
       .catch(console.error);
@@ -17,10 +16,18 @@ export default function Question(props) {
 
   return (
     <Box pad="medium" fill="vertical">
-      {questions.map((question, index) => {
+      {questions.map((question, questionIndex) => {
+        const ComponentToUse =
+          question.type === "radio" ? RadioButtonGroup : CheckBoxGroup;
         return (
-          <Heading key={index} size="medium" level={2}>
+          <Heading key={questionIndex} size="medium" level={2}>
             {question.name}
+            <Box pad="small" fill="vertical">
+              <ComponentToUse
+                options={question.answers.map(answer => answer.value)}
+                name={question.id}
+              />
+            </Box>
           </Heading>
         );
       })}

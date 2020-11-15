@@ -6,7 +6,7 @@ let client;
 new MongoClient(url, { useUnifiedTopology: true })
   .connect()
   .then(connection => {
-    console.log("Connected to MongoDB");
+    if (process.env.NODE_ENV !== "test") console.log("Connected to MongoDB");
     client = connection;
   })
   .catch(console.error);
@@ -62,13 +62,25 @@ function findManyFromCollection(collection, query) {
   return new Promise(async (resolve, reject) => {
     getConnection(collection)
       .find(query)
-      .toArray((err, result) => {
+      .toArray((err, results) => {
         if (err) return reject(err);
-        resolve(result.map(extractId));
+        resolve(results.map(extractId));
       });
   }).catch(err => {
     console.error(err);
   });
+}
+
+function aggregateManyFromCollection(collection, query) {
+  return new Promise(async (resolve, reject) => {
+    getConnection(collection).aggregate(query, (err, cursor) => {
+      if (err) reject(err);
+      cursor.toArray((err, results) => {
+        if (err) reject(err);
+        resolve(results.map(extractId));
+      });
+    });
+  }).catch(console.error);
 }
 
 dataAccessor.refreshTokens = {
@@ -124,9 +136,20 @@ dataAccessor.quizzes = {
 
 dataAccessor.questions = {
   all: quizId => {
-    return findManyFromCollection("questions", {
-      quizId: new ObjectId(quizId)
-    });
+    return aggregateManyFromCollection("questions", [
+      { $match: { quizId: ObjectId(quizId) } },
+      {
+        $lookup: {
+          from: "answers",
+          let: { question_id: "$_id" },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$questionId", "$$question_id"] } } },
+            { $project: { correct: 0 } }
+          ],
+          as: "answers"
+        }
+      }
+    ]);
   },
   add: (quizId, name) => {
     return insertToCollection("questions", { name, quizId });
@@ -134,8 +157,8 @@ dataAccessor.questions = {
 };
 
 dataAccessor.answers = {
-  all: questionId => {
-    return findManyFromCollection("answers", { questionId });
+  allCorrect: () => {
+    return new Promise(resolve => resolve());
   },
   add: (questionId, correct) => {
     return insertToCollection("answers", { questionId, correct });

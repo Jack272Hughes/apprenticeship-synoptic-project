@@ -23,9 +23,10 @@ describe("When running the authServer it", () => {
     request = supertest(app);
   });
 
-  it("Should start successfully", async () => {
+  it("Should start successfully", done => {
     app = server.listen(0, () => {
-      expect(app).toMatchObject(expect.any(Object));
+      expect(app).toBeDefined();
+      done();
     });
   });
 });
