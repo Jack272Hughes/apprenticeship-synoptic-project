@@ -5,6 +5,6 @@ const config = {
 };
 
 if (process.env.production === "docker") config.url = "mongodb://mongodb:27017";
-if (process.env.NODE_ENV === "test") config.jwtSecret = "testSecret";
+if (process.env.NODE_ENV === "test") config.jwtSecret = "testingSecret";
 
 module.exports = config;

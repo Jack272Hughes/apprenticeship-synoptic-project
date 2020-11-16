@@ -1,6 +1,8 @@
 const dataAccessor = {};
+const { MongoClient, ObjectId, Cursor } = require("mongodb");
+
 const { url, dbName } = require("../config.js");
-const { MongoClient, ObjectId } = require("mongodb");
+const mongodbQueries = require("./mongodbQueries");
 
 let client;
 new MongoClient(url, { useUnifiedTopology: true })
@@ -53,6 +55,7 @@ function extractId(rowObject) {
 
 function findOneFromCollection(collection, query) {
   return collectionQueryAsPromise(collection, "findOne", query, result => {
+    console.log(result);
     if (!result) return null;
     else return extractId(result);
   });
@@ -75,6 +78,7 @@ function aggregateManyFromCollection(collection, query) {
   return new Promise(async (resolve, reject) => {
     getConnection(collection).aggregate(query, (err, cursor) => {
       if (err) reject(err);
+      console.log(cursor instanceof Cursor);
       cursor.toArray((err, results) => {
         if (err) reject(err);
         resolve(results.map(extractId));
@@ -127,82 +131,42 @@ dataAccessor.users = {
 
 dataAccessor.quizzes = {
   all: () => {
+    findOneFromCollection("quizzes", { title: "diuehfie" });
     return findManyFromCollection("quizzes", {});
   },
   add: (userOid, name, description) => {
     return insertToCollection("quizzes", { userOid, name, description });
   },
   get: quizId => {
-    return aggregateManyFromCollection("quizzes", [
-      { $match: { _id: ObjectId(quizId) } },
-      {
-        $lookup: {
-          from: "questions",
-          localField: "_id",
-          foreignField: "quizId",
-          as: "questions"
-        }
-      },
-      {
-        $project: {
-          name: 1,
-          description: 1,
-          totalQuestions: { $size: "$questions" },
-          maximumScore: {
-            $sum: {
-              $map: {
-                input: "$questions",
-                as: "question",
-                in: {
-                  $size: {
-                    $filter: {
-                      input: "$$question.answers",
-                      as: "answer",
-                      cond: { $eq: ["$$answer.correct", true] }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    ]);
+    return aggregateManyFromCollection(
+      "quizzes",
+      mongodbQueries.getQuiz(quizId)
+    );
+  },
+  update: (quizId, quiz) => {
+    // db.quizzes.update({ _id: "" }, { $set: { role: "USER" }})
+  },
+  delete: quizId => {
+    // db.quizzes.deleteOne({ _id: "" })
   }
 };
 
 dataAccessor.questions = {
   all: quizId => {
-    return aggregateManyFromCollection("questions", [
-      { $match: { quizId: ObjectId(quizId) } },
-      { $project: { "answers.correct": 0, quizId: 0 } }
-    ]);
+    return aggregateManyFromCollection(
+      "questions",
+      mongodbQueries.allQuestions(quizId)
+    );
   },
   add: (quizId, name, answers) => {
     return insertToCollection("questions", { name, quizId, answers });
   },
   answers: {
     correct: quizId => {
-      return aggregateManyFromCollection("questions", [
-        { $match: { quizId: ObjectId(quizId) } },
-        {
-          $project: {
-            answers: {
-              $map: {
-                input: {
-                  $filter: {
-                    input: "$answers",
-                    as: "answer",
-                    cond: { $eq: ["$$answer.correct", true] }
-                  }
-                },
-                as: "answer",
-                in: "$$answer.value"
-              }
-            }
-          }
-        }
-      ]);
+      return aggregateManyFromCollection(
+        "questions",
+        mongodbQueries.correctAnswersForQuestion(quizId)
+      );
     }
   }
 };

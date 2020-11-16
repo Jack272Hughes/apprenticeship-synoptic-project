@@ -3,9 +3,11 @@ const app = express();
 const upload = require("multer")();
 const cors = require("cors");
 const expressJwt = require("express-jwt");
+const jwt = require("jsonwebtoken");
 
 const { jwtSecret } = require("../config.js");
 const dataAccessor = require("../utils/dataAccessor");
+const roles = { USER: 0, MODERATOR: 1, ADMIN: 2 };
 
 app.use(express.json());
 app.use(upload.array());
@@ -20,16 +22,67 @@ if (process.env.NODE_ENV !== "test") {
   app.use(expressJwt({ secret: jwtSecret, algorithms: ["HS256"] }));
 }
 
+const shouldHaveRole = role => (req, res, next) => {
+  const authHeader = Object.entries(req.headers).find(
+    ([headerKey]) => headerKey.toLowerCase() === "authorization"
+  );
+
+  if (!authHeader) return res.sendStatus(403);
+
+  const authToken = jwt.decode(authHeader[1]);
+  const currentRole = roles[authToken.role];
+
+  if (currentRole < roles[role]) return res.sendStatus(403);
+  else next();
+};
+
+function objectIsEmpty(obj) {
+  return JSON.stringify(obj) === "{}";
+}
+
 app.get("/quizzes", (req, res) => {
   dataAccessor.quizzes.all().then(quizzes => {
     res.json({ quizzes });
   });
 });
 
+app.post("/quizzes", shouldHaveRole("ADMIN"), (req, res) => {
+  const { quiz } = req.body;
+
+  if (!quiz || objectIsEmpty(quiz)) return res.sendStatus(404);
+
+  dataAccessor.quizzes
+    .add(quiz)
+    .then(() => res.sendStatus(200))
+    .catch(() => res.sendStatus(500));
+});
+
+app.patch("/quizzes/:quizId", shouldHaveRole("ADMIN"), (req, res) => {
+  const quizId = req.params.quizId;
+  const { quiz } = req.body;
+
+  if (!quiz || objectIsEmpty(quiz)) return res.sendStatus(404);
+
+  dataAccessor.quizzes
+    .update(quizId, quiz)
+    .then(() => res.sendStatus(200))
+    .catch(() => res.sendStatus(500));
+});
+
+app.delete("/quizzes/:quizId", shouldHaveRole("ADMIN"), (req, res) => {
+  const quizId = req.params.quizId;
+
+  dataAccessor.quizzes
+    .delete(quizId)
+    .then(() => res.sendStatus(200))
+    .catch(() => res.sendStatus(500));
+});
+
 app.get("/quizzes/:quizId", (req, res) => {
   const quizId = req.params.quizId;
   dataAccessor.quizzes.get(quizId).then(quiz => {
-    res.json({ quiz: quiz[0] });
+    if (quiz.length === 0) res.sendStatus(404);
+    else res.json({ quiz: quiz[0] });
   });
 });
 
@@ -43,7 +96,7 @@ app.get("/quizzes/:quizId/questions", (req, res) => {
 app.post("/quizzes/:quizId/check", (req, res) => {
   const quizId = req.params.quizId;
   const { answers: userAnswers } = req.body;
-  if (JSON.stringify(userAnswers) === "{}") return res.sendStatus(404);
+  if (!userAnswers || objectIsEmpty(userAnswers)) return res.sendStatus(404);
 
   dataAccessor.questions.answers.correct(quizId).then(actualAnswers => {
     let result = { total: 0, correct: 0 };
@@ -59,6 +112,18 @@ app.post("/quizzes/:quizId/check", (req, res) => {
     });
     res.json(result);
   });
+});
+
+app.post("/users/:userOid/scores", (req, res) => {
+  const userOid = req.params.userOid;
+  const { score } = req.body;
+
+  if (!score || objectIsEmpty(score)) return res.sendStatus(404);
+
+  dataAccessor.scores
+    .add(userOid, score)
+    .then(() => res.sendStatus(200))
+    .catch(() => res.sendStatus(500));
 });
 
 if (process.env.NODE_ENV !== "test") app.listen(8080);

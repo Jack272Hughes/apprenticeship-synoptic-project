@@ -2,12 +2,25 @@ const supertest = require("supertest");
 const server = require("./server");
 
 const dataAccessor = require("../utils/dataAccessor");
+const mockAuthTokens = require("./mockAuthTokens");
 
+jest.unmock("jsonwebtoken");
 let app, request;
 
 afterAll(() => {
   app.close();
 });
+
+const requestGenerator = httpMethod => (route, role = "ADMIN") => {
+  return request[httpMethod](route).set("Authorization", mockAuthTokens[role]);
+};
+
+const requestWithAuth = {
+  get: requestGenerator("get"),
+  post: requestGenerator("post"),
+  patch: requestGenerator("patch"),
+  delete: requestGenerator("delete")
+};
 
 describe("When running the authServer it", () => {
   afterAll(async () => {
@@ -39,6 +52,92 @@ describe("When calling the route GET /quizzes it", () => {
   });
 });
 
+describe("When calling the route POST /quizzes it", () => {
+  const mockQuiz = { quiz: { name: "quiz1" } };
+
+  beforeEach(() => {
+    mockDataAccessor("quizzes.add", true);
+  });
+
+  it("Should send a status of 404 when no body is sent", done => {
+    requestWithAuth.post("/quizzes", "ADMIN").expect(404, done);
+  });
+
+  it("Should send a status of 404 when an empty object is sent", done => {
+    requestWithAuth
+      .post("/quizzes", "ADMIN")
+      .send({ quiz: {} })
+      .expect(404, done);
+  });
+
+  it("Should send a status of 403 when a non-admin authorization token is sent", done => {
+    requestWithAuth.post("/quizzes", "MODERATOR").expect(403, done);
+  });
+
+  it("Should call dataAccessor.quizzes.add function wuth correct parameter", async () => {
+    await requestWithAuth.post("/quizzes", "ADMIN").send(mockQuiz);
+    expect(dataAccessor.quizzes.add).toBeCalledWith({ name: "quiz1" });
+  });
+
+  it("Should send a status of 200 when adding successfully", done => {
+    requestWithAuth.post("/quizzes", "ADMIN").send(mockQuiz).expect(200, done);
+  });
+});
+
+describe("When calling the route PATCH /quizzes/1 it", () => {
+  const mockQuiz = { quiz: { name: "quiz1" } };
+
+  beforeEach(() => {
+    mockDataAccessor("quizzes.update", true);
+  });
+
+  it("Should send a status of 404 when no body is sent", done => {
+    requestWithAuth.patch("/quizzes/1", "ADMIN").expect(404, done);
+  });
+
+  it("Should send a status of 404 when an empty object is sent", done => {
+    requestWithAuth
+      .patch("/quizzes/1", "ADMIN")
+      .send({ quiz: {} })
+      .expect(404, done);
+  });
+
+  it("Should send a status of 403 when a non-admin authorization token is sent", done => {
+    requestWithAuth.patch("/quizzes/1", "MODERATOR").expect(403, done);
+  });
+
+  it("Should call dataAccessor.quizzes.update function wuth correct parameters", async () => {
+    await requestWithAuth.patch("/quizzes/1", "ADMIN").send(mockQuiz);
+    expect(dataAccessor.quizzes.update).toBeCalledWith("1", { name: "quiz1" });
+  });
+
+  it("Should send a status of 200 when updating successfully", done => {
+    requestWithAuth
+      .patch("/quizzes/1", "ADMIN")
+      .send(mockQuiz)
+      .expect(200, done);
+  });
+});
+
+describe("When calling the route DELETE /quizzes/1 it", () => {
+  beforeEach(() => {
+    mockDataAccessor("quizzes.delete", true);
+  });
+
+  it("Should send a status of 403 when a non-admin authorization token is sent", done => {
+    requestWithAuth.delete("/quizzes/1", "MODERATOR").expect(403, done);
+  });
+
+  it("Should call dataAccessor.quizzes.delete function with correct parameter", async () => {
+    await requestWithAuth.delete("/quizzes/1", "ADMIN");
+    expect(dataAccessor.quizzes.delete).toBeCalledWith("1");
+  });
+
+  it("Should send a status of 200 when successfully deleting", done => {
+    requestWithAuth.delete("/quizzes/1", "ADMIN").expect(200, done);
+  });
+});
+
 describe("When calling the route GET /quizzes/1 it", () => {
   const mockQuiz = [{ name: "quiz1" }];
 
@@ -51,7 +150,7 @@ describe("When calling the route GET /quizzes/1 it", () => {
     expect(dataAccessor.quizzes.get).toBeCalledWith("1");
   });
 
-  it("Should return all correct quizzes in an object", done => {
+  it("Should return the correct quiz in an object", done => {
     request.get("/quizzes/1").expect(200, { quiz: mockQuiz[0] }, done);
   });
 });
@@ -77,8 +176,8 @@ describe("When calling the route GET /quizzes/:quizId/questions it", () => {
 
 describe("When calling the route POST /quizzes/1/check it", () => {
   const mockCorrectAnswers = [
-    { questionId: "radio", answers: ["a"] },
-    { questionId: "checkbox", answers: ["b", "c"] }
+    { id: "radio", answers: ["a"] },
+    { id: "checkbox", answers: ["b", "c"] }
   ];
 
   beforeEach(() => {
@@ -104,14 +203,3 @@ describe("When calling the route POST /quizzes/1/check it", () => {
       .expect(200, { total: 3, correct: 2 }, done);
   });
 });
-
-// describe("When calling the route POST /quizzes it", () => {
-//   it("Should call the dataAccessor.quizzes.add function", async () => {
-//     await request.post("/quizzes").send({});
-//     expect(dataAccessor.quizzes.add).toBeCalledWith({});
-//   });
-// });
-
-// describe("When calling the route PATCH /quizzes/1 it", () => {});
-
-// describe("When calling the route DELETE /quizzes/1 it", () => {});
