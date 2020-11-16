@@ -211,7 +211,7 @@ describe("When calling the /logout route it", () => {
 
     expect(helperFunctions.parseCookies).toBeCalledWith("mockCookie");
     expect(jwt.decode).toBeCalledWith("mockAuthToken");
-    expect(dataAccessor.refreshTokens.remove).toBeCalledWith(
+    expect(dataAccessor.refreshTokens.delete).toBeCalledWith(
       "createdHash",
       "username"
     );

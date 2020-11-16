@@ -1,5 +1,5 @@
 const dataAccessor = {};
-const { MongoClient, ObjectId, Cursor } = require("mongodb");
+const { MongoClient, ObjectId, Cursor, ObjectID } = require("mongodb");
 
 const { url, dbName } = require("../config.js");
 const mongodbQueries = require("./mongodbQueries");
@@ -18,25 +18,46 @@ function getConnection(collection) {
   return collection ? db.collection(collection) : db;
 }
 
+function extractId(rowObject) {
+  const { _id, ...rest } = rowObject;
+  rest.id = _id.toString();
+  return rest;
+}
+
 function collectionQueryAsPromise(
   collectionName,
   functionName,
-  query,
-  callback
+  query = {},
+  options = {}
 ) {
-  return new Promise(async (resolve, reject) => {
-    getConnection(collectionName)[functionName](query, (err, result) => {
-      if (err) return reject(err);
-      if (callback) result = callback(result);
-      resolve(result);
-    });
-  }).catch(err => {
-    console.error(err);
-  });
+  return new Promise((resolve, reject) => {
+    let response;
+    if (options.multiParams) {
+      response = getConnection(collectionName)[functionName](...query);
+    } else {
+      response = getConnection(collectionName)[functionName](query);
+    }
+
+    if (response instanceof Cursor) response = response.toArray();
+
+    response
+      .then(results => {
+        if (options.extractId && results !== null) {
+          if (Array.isArray(results)) {
+            resolve(results.map(extractId));
+          } else {
+            resolve(extractId(results));
+          }
+        } else {
+          resolve(results);
+        }
+      })
+      .catch(reject);
+  }).catch(console.error);
 }
 
-function deleteFromCollection(collection, query) {
-  return collectionQueryAsPromise(collection, "deleteMany", query);
+function deleteFromCollection(collection, selection) {
+  return collectionQueryAsPromise(collection, "deleteMany", selection);
 }
 
 function insertToCollection(collection, insertions) {
@@ -47,44 +68,42 @@ function insertToCollection(collection, insertions) {
   );
 }
 
-function extractId(rowObject) {
-  const { _id, ...rest } = rowObject;
-  rest.id = _id.toString();
-  return rest;
-}
-
-function findOneFromCollection(collection, query) {
-  return collectionQueryAsPromise(collection, "findOne", query, result => {
-    console.log(result);
-    if (!result) return null;
-    else return extractId(result);
+function findOneFromCollection(collection, selection) {
+  return collectionQueryAsPromise(collection, "findOne", selection, {
+    extractId: true
   });
 }
 
-function findManyFromCollection(collection, query) {
-  return new Promise(async (resolve, reject) => {
-    getConnection(collection)
-      .find(query)
-      .toArray((err, results) => {
-        if (err) return reject(err);
-        resolve(results.map(extractId));
-      });
-  }).catch(err => {
-    console.error(err);
+function findManyFromCollection(collection, selection) {
+  return collectionQueryAsPromise(collection, "find", selection, {
+    extractId: true
   });
 }
 
-function aggregateManyFromCollection(collection, query) {
-  return new Promise(async (resolve, reject) => {
-    getConnection(collection).aggregate(query, (err, cursor) => {
-      if (err) reject(err);
-      console.log(cursor instanceof Cursor);
-      cursor.toArray((err, results) => {
-        if (err) reject(err);
-        resolve(results.map(extractId));
-      });
-    });
-  }).catch(console.error);
+function aggregateManyFromCollection(collection, selection) {
+  return collectionQueryAsPromise(collection, "aggregate", selection, {
+    extractId: true
+  });
+}
+
+function replaceOneFromCollection(collection, selection, replacement) {
+  return collectionQueryAsPromise(
+    collection,
+    "replaceOne",
+    [selection, replacement],
+    {
+      multiParams: true
+    }
+  );
+}
+
+function updateOneFromCollection(collection, selection, updateQuery) {
+  return collectionQueryAsPromise(
+    collection,
+    "updateOne",
+    [selection, { $set: { updateQuery } }],
+    { multiParams: true }
+  );
 }
 
 dataAccessor.refreshTokens = {
@@ -95,20 +114,15 @@ dataAccessor.refreshTokens = {
       createdAt: new Date()
     });
   },
-  remove: (token, username) => {
+  delete: (token, username) => {
     return deleteFromCollection("refreshTokens", { token, username });
   },
   replace: (token, username, newToken) => {
-    return new Promise(async (resolve, reject) => {
-      getConnection("refreshTokens").replaceOne(
-        { token, username },
-        { token: newToken, username, createdAt: new Date() },
-        (err, result) => {
-          if (err) reject(err);
-          else resolve(result);
-        }
-      );
-    }).catch(console.error);
+    return replaceOneFromCollection(
+      "refeshTokens",
+      { token, username },
+      { token: newToken, username, createdAt: new Date() }
+    );
   },
   validate: (token, username) => {
     return findOneFromCollection("refreshTokens", { token, username });
@@ -131,7 +145,6 @@ dataAccessor.users = {
 
 dataAccessor.quizzes = {
   all: () => {
-    findOneFromCollection("quizzes", { title: "diuehfie" });
     return findManyFromCollection("quizzes", {});
   },
   add: (userOid, name, description) => {
@@ -144,10 +157,11 @@ dataAccessor.quizzes = {
     );
   },
   update: (quizId, quiz) => {
-    // db.quizzes.update({ _id: "" }, { $set: { role: "USER" }})
+    updateOneFromCollection("quizzes", { _id: ObjectId(quizId) }, quiz);
   },
   delete: quizId => {
     // db.quizzes.deleteOne({ _id: "" })
+    deleteFromCollection("quizzes", { _id: ObjectId(quizId) });
   }
 };
 

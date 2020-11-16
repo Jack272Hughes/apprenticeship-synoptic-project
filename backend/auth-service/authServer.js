@@ -90,7 +90,7 @@ app.post("/logout", (req, res) => {
   if (!cookies.rft) return res.sendStatus(404);
 
   const decodedToken = jwt.decode(cookies.authToken);
-  dataAccessor.refreshTokens.remove(
+  dataAccessor.refreshTokens.delete(
     createHash(cookies.rft),
     decodedToken.username
   );
