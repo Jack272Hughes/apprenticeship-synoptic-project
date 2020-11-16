@@ -51,7 +51,9 @@ app.post("/quizzes", shouldHaveRole("ADMIN"), (req, res) => {
 
   dataAccessor.quizzes
     .add(quiz)
-    .then(() => res.sendStatus(200))
+    .then(response => {
+      res.json({ insertedId: response.insertedId });
+    })
     .catch(() => res.sendStatus(500));
 });
 

@@ -147,8 +147,12 @@ dataAccessor.quizzes = {
   all: () => {
     return findManyFromCollection("quizzes", {});
   },
-  add: (userOid, name, description) => {
-    return insertIntoCollection("quizzes", { userOid, name, description });
+  add: ({ userOid, name, description }) => {
+    return insertIntoCollection("quizzes", {
+      userOid: ObjectId(userOid),
+      name,
+      description
+    });
   },
   get: quizId => {
     return aggregateManyFromCollection(
@@ -160,7 +164,6 @@ dataAccessor.quizzes = {
     updateOneFromCollection("quizzes", { _id: ObjectId(quizId) }, quiz);
   },
   delete: quizId => {
-    // db.quizzes.deleteOne({ _id: "" })
     deleteFromCollection("quizzes", { _id: ObjectId(quizId) });
   }
 };
@@ -172,10 +175,17 @@ dataAccessor.questions = {
       mongodbQueries.allQuestions(quizId)
     );
   },
-  add: (quizId, name, answers) => {
-    return insertIntoCollection("questions", { name, quizId, answers });
+  add: ({ quizId, name, answers }) => {
+    return insertIntoCollection("questions", {
+      name,
+      quizId: ObjectId(quizId),
+      answers
+    });
   },
   answers: {
+    all: quizId => {
+      return findManyFromCollection("questions", { quizId: ObjectId(quizId) });
+    },
     correct: quizId => {
       return aggregateManyFromCollection(
         "questions",
@@ -186,8 +196,12 @@ dataAccessor.questions = {
 };
 
 dataAccessor.scores = {
-  add: (userOid, score) => {
-    return insertIntoCollection("scores", { userOid, ...score });
+  add: (userOid, { total, correct }) => {
+    return insertIntoCollection("scores", {
+      userOid: ObjectId(userOid),
+      total,
+      correct
+    });
   }
 };
 

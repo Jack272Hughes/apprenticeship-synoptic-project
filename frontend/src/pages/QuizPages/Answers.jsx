@@ -11,7 +11,7 @@ export default function Answers(props) {
     axiosInstance.get(`/quizzes/${quizId}/questions/answers`).then(response => {
       setQuestions(response.data.questions);
     });
-  }, []);
+  }, [quizId]);
 
   return (
     <Box justify="center" align="center" pad="xlarge">

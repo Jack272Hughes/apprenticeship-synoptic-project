@@ -1,7 +1,7 @@
 const { ObjectId } = require("mongodb");
 
 module.exports = {
-  // Get quiz from given quiz id
+  // Get quiz for a given quiz id
   // Count total questions as totalQuestions
   // Count total answers with { correct: true } as maximumScore
   getQuiz: quizId => [

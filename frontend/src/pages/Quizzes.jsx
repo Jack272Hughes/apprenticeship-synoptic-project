@@ -25,6 +25,7 @@ export default function Quizzes(props) {
       justify="center"
       direction="row"
       gap="medium"
+      wrap
     >
       {quizzes.map((quiz, index) => {
         return (
@@ -32,8 +33,9 @@ export default function Quizzes(props) {
             key={`quiz${index}`}
             width="medium"
             onClick={() => history.push(`/quizzes/${quiz.id}`)}
+            margin="small"
           >
-            <CardHeader justify="center" pad="medium" background="dark-1">
+            <CardHeader wrap justify="center" pad="medium" background="dark-1">
               <Heading size="medium" level={2}>
                 {quiz.name}
               </Heading>

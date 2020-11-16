@@ -1,20 +1,57 @@
 import React from "react";
 import { Nav, Anchor, Header, Box } from "grommet";
+import { Link } from "react-router-dom";
 
-const items = [
-  { label: "Home", href: "/" },
-  { label: "Quizzes", href: "/quizzes" }
-];
+import { CreateQuizModal } from "../components";
 
 export default function Navbar(props) {
+  const { token, roles, logout, setModalContent } = props;
+
+  const itemList = () => {
+    const items = [
+      { label: "Home", href: "/" },
+      { label: "Quizzes", href: "/quizzes" }
+    ];
+
+    if (roles[token.role] >= roles.ADMIN) {
+      items.push({
+        label: "Create Quiz",
+        onClick: () =>
+          setModalContent(
+            <CreateQuizModal
+              userOid={token.oid}
+              setModalContent={setModalContent}
+            />
+          )
+      });
+    }
+
+    return items;
+  };
+
   return (
     <Header data-test-id="navbar" background="dark-1" pad="medium">
       <Nav direction="row" gap="large">
-        {items.map(item => (
+        {itemList().map(item => (
           <Anchor
+            as={({ colorProp, hasIcon, hasLabel, ...props }) => {
+              if (item.href) {
+                return (
+                  <Link {...props} to={item.href}>
+                    {item.label}
+                  </Link>
+                );
+              } else if (item.onClick) {
+                return (
+                  <Anchor
+                    {...props}
+                    onClick={item.onClick}
+                    label={item.label}
+                  />
+                );
+              }
+            }}
             size="xxlarge"
-            href={item.href}
-            label={item.label}
             key={item.label}
           />
         ))}
@@ -25,12 +62,12 @@ export default function Navbar(props) {
           color="white"
           onClick={() => console.log("Goto profile")}
         >
-          {props.username}
+          {token.username}
         </Anchor>
         <Anchor
           size="xxlarge"
           color="white"
-          onClick={props.logout}
+          onClick={logout}
           style={{ paddingLeft: "2rem" }}
         >
           Logout

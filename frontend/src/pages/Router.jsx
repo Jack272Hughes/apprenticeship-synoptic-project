@@ -1,19 +1,37 @@
 import React from "react";
+import { Layer } from "grommet";
 import { Switch, Route, BrowserRouter as Router } from "react-router-dom";
 
 import { Navbar } from "../components";
 import HomePage from "./Home";
 import AllQuizzesPage from "./Quizzes";
+import EditQuizPage from "./EditQuiz";
 import { QuizHandler } from "./QuizPages";
 
 export default function Routes(props) {
+  const [modalContent, setModalContent] = React.useState(null);
+
   const { logout, decodedToken } = props;
   const roles = { USER: 0, MODERATOR: 1, ADMIN: 2 };
+
+  const handleClose = () => {
+    setModalContent(null);
+  };
 
   return (
     <>
       <Router>
-        <Navbar username={decodedToken.username} logout={logout} />
+        {modalContent && (
+          <Layer onEsc={handleClose} onClickOutside={handleClose}>
+            {modalContent}
+          </Layer>
+        )}
+        <Navbar
+          token={decodedToken}
+          roles={roles}
+          logout={logout}
+          setModalContent={setModalContent}
+        />
         <Switch>
           <Route exact path="/">
             <HomePage />
@@ -22,6 +40,7 @@ export default function Routes(props) {
             <AllQuizzesPage />
           </Route>
           <Route
+            exact
             path="/quizzes/:quizId"
             render={props => (
               <QuizHandler
@@ -29,6 +48,13 @@ export default function Routes(props) {
                 roles={roles}
                 token={decodedToken}
               />
+            )}
+          />
+          <Route
+            exact
+            path="/quizzes/:quizId/edit"
+            render={props => (
+              <EditQuizPage quizId={props.match.params.quizId} />
             )}
           />
         </Switch>
