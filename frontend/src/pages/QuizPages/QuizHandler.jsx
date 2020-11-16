@@ -32,7 +32,7 @@ export default function QuizHandler(props) {
           />
         );
       case "results":
-        return <Results quiz={quiz} />;
+        return <Results quiz={quiz} userAnswers={userAnswers} />;
       default:
         return (
           <Quiz

@@ -33,7 +33,7 @@ export default function Quizzes(props) {
             width="medium"
             onClick={() => history.push(`/quizzes/${quiz.id}`)}
           >
-            <CardHeader pad="medium" background="dark-1">
+            <CardHeader justify="center" pad="medium" background="dark-1">
               <Heading size="medium" level={2}>
                 {quiz.name}
               </Heading>
