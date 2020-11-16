@@ -20,6 +20,11 @@ export default function QuizHandler(props) {
       .catch(console.error);
   }, [quizId]);
 
+  const viewQuizOverview = () => {
+    setQuizStage("quizInfo");
+    setUserAnswers({});
+  };
+
   const renderStage = () => {
     switch (quizStage) {
       case "questions":
@@ -32,7 +37,18 @@ export default function QuizHandler(props) {
           />
         );
       case "results":
-        return <Results quiz={quiz} userAnswers={userAnswers} />;
+        return (
+          <Results
+            quiz={quiz}
+            userAnswers={userAnswers}
+            userOid={token.oid}
+            viewQuizOverview={viewQuizOverview}
+            viewQuestions={() => {
+              setQuizStage("questions");
+              setUserAnswers({});
+            }}
+          />
+        );
       default:
         return (
           <Quiz
@@ -52,10 +68,7 @@ export default function QuizHandler(props) {
           margin="medium"
           primary
           plain={false}
-          onClick={() => {
-            setQuizStage("quizInfo");
-            setUserAnswers({});
-          }}
+          onClick={viewQuizOverview}
         >
           Return To Quiz Overview
         </Button>

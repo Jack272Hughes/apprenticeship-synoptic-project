@@ -96,12 +96,19 @@ app.get("/quizzes/:quizId/questions", (req, res) => {
 app.post("/quizzes/:quizId/check", (req, res) => {
   const quizId = req.params.quizId;
   const { answers: userAnswers } = req.body;
-  if (!userAnswers || objectIsEmpty(userAnswers)) return res.sendStatus(404);
+  if (!userAnswers) return res.sendStatus(404);
 
-  dataAccessor.questions.answers.correct(quizId).then(actualAnswers => {
+  dataAccessor.questions.answers.correct(quizId).then(questions => {
+    if (objectIsEmpty(userAnswers)) {
+      return res.json({
+        total: questions.reduce((acc, { answers }) => acc + answers.length, 0),
+        correct: 0
+      });
+    }
+
     let result = { total: 0, correct: 0 };
 
-    actualAnswers.forEach(({ id: questionId, answers }) => {
+    questions.forEach(({ id: questionId, answers }) => {
       let userAnswer = userAnswers[questionId];
       if (!Array.isArray(userAnswer)) userAnswer = [userAnswer];
 

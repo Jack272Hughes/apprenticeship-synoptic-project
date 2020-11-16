@@ -184,11 +184,22 @@ describe("When calling the route POST /quizzes/1/check it", () => {
     mockDataAccessor("questions.answers.correct", mockCorrectAnswers);
   });
 
+  it("Should return a status of 404 if no body is sent", done => {
+    request.post("/quizzes/1/check").expect(404, done);
+  });
+
   it("Should call dataAccessor.questions.answers.correct function with correct parameter", async () => {
     await request
       .post("/quizzes/1/check")
       .send({ answers: { radio: [], checkbox: [] } });
     expect(dataAccessor.questions.answers.correct).toBeCalledWith("1");
+  });
+
+  it("Should return maximum total and 0 correct when results is an empty object", done => {
+    request
+      .post("/quizzes/1/check")
+      .send({ answers: {} })
+      .expect(200, { total: 3, correct: 0 }, done);
   });
 
   it("Should return maximum total and total correct", done => {

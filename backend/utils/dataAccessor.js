@@ -60,7 +60,7 @@ function deleteFromCollection(collection, selection) {
   return collectionQueryAsPromise(collection, "deleteMany", selection);
 }
 
-function insertToCollection(collection, insertions) {
+function insertIntoCollection(collection, insertions) {
   return collectionQueryAsPromise(
     collection,
     Array.isArray(insertions) ? "insertMany" : "insertOne",
@@ -108,7 +108,7 @@ function updateOneFromCollection(collection, selection, updateQuery) {
 
 dataAccessor.refreshTokens = {
   add: (token, username) => {
-    return insertToCollection("refreshTokens", {
+    return insertIntoCollection("refreshTokens", {
       token,
       username,
       createdAt: new Date()
@@ -131,7 +131,7 @@ dataAccessor.refreshTokens = {
 
 dataAccessor.users = {
   add: (username, password, salt) => {
-    return insertToCollection("users", {
+    return insertIntoCollection("users", {
       username,
       password,
       salt,
@@ -148,7 +148,7 @@ dataAccessor.quizzes = {
     return findManyFromCollection("quizzes", {});
   },
   add: (userOid, name, description) => {
-    return insertToCollection("quizzes", { userOid, name, description });
+    return insertIntoCollection("quizzes", { userOid, name, description });
   },
   get: quizId => {
     return aggregateManyFromCollection(
@@ -173,7 +173,7 @@ dataAccessor.questions = {
     );
   },
   add: (quizId, name, answers) => {
-    return insertToCollection("questions", { name, quizId, answers });
+    return insertIntoCollection("questions", { name, quizId, answers });
   },
   answers: {
     correct: quizId => {
@@ -182,6 +182,12 @@ dataAccessor.questions = {
         mongodbQueries.correctAnswersForQuestion(quizId)
       );
     }
+  }
+};
+
+dataAccessor.scores = {
+  add: (userOid, score) => {
+    return insertIntoCollection("scores", { userOid, ...score });
   }
 };
 

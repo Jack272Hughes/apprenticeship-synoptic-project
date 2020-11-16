@@ -7,7 +7,7 @@ export default function Results(props) {
   const [userResults, setUserResults] = React.useState({});
   const [meterLabel, setMeterLabel] = React.useState("");
 
-  const { quiz, userAnswers } = props;
+  const { quiz, userAnswers, userOid, viewQuizOverview, viewQuestions } = props;
   const totalCorrectPercentage = Math.floor(
     (userResults.correct / userResults.total) * 100
   );
@@ -16,9 +16,8 @@ export default function Results(props) {
     if (quiz.id && userAnswers) {
       axiosInstance
         .post(`/quizzes/${quiz.id}/check`, { answers: userAnswers })
-        .then(response => {
-          setUserResults(response.data);
-        });
+        .then(response => setUserResults(response.data))
+        .catch(() => setUserResults({ correct: 0, total: 1 }));
     }
   }, [quiz, userAnswers]);
 
@@ -30,6 +29,14 @@ export default function Results(props) {
     if (isHovered)
       setMeterLabel(`${userResults.correct} / ${userResults.total}`);
     else setMeterLabel(totalCorrectPercentage + "%");
+  };
+
+  const handleSave = () => {
+    axiosInstance
+      .post(`/users/${userOid}/scores`, {
+        score: { ...userResults, quizId: quiz.id }
+      })
+      .finally(viewQuizOverview);
   };
 
   return (
@@ -52,9 +59,26 @@ export default function Results(props) {
           <Text size="xxlarge">{meterLabel}</Text>
         </Box>
       </Stack>
-      <Button primary margin="medium" size="large" plain={false}>
-        Submit Answers
-      </Button>
+      <Box direction="row">
+        <Button
+          primary
+          margin="medium"
+          size="large"
+          plain={false}
+          onClick={handleSave}
+        >
+          Save Answers
+        </Button>
+        <Button
+          primary
+          margin="medium"
+          size="large"
+          plain={false}
+          onClick={viewQuestions}
+        >
+          Retake Quiz
+        </Button>
+      </Box>
     </Box>
   );
 }
