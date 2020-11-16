@@ -28,7 +28,6 @@ export default function useCookies() {
       if (cookieChanged) setUseCookies(getCookies());
     },
     cookieKeys => {
-      console.log("Called with " + cookieKeys);
       let cookieChanged = false;
       // If an array isn't passed, make it an array
       if (!Array.isArray(cookieKeys)) cookieKeys = [cookieKeys];

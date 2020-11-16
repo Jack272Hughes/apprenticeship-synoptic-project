@@ -23,16 +23,13 @@ export default function Routes(props) {
           </Route>
           <Route
             path="/quizzes/:quizId"
-            render={props => {
-              const quizId = props.match.params.quizId;
-              return (
-                <QuizHandler
-                  quizId={quizId}
-                  roles={roles}
-                  token={decodedToken}
-                />
-              );
-            }}
+            render={props => (
+              <QuizHandler
+                quizId={props.match.params.quizId}
+                roles={roles}
+                token={decodedToken}
+              />
+            )}
           />
         </Switch>
       </Router>

@@ -12,7 +12,10 @@ afterAll(() => {
 });
 
 const requestGenerator = httpMethod => (route, role = "ADMIN") => {
-  return request[httpMethod](route).set("Authorization", mockAuthTokens[role]);
+  return request[httpMethod](route).set(
+    "Authorization",
+    `Bearer ${mockAuthTokens[role]}`
+  );
 };
 
 const requestWithAuth = {
@@ -174,14 +177,39 @@ describe("When calling the route GET /quizzes/:quizId/questions it", () => {
   });
 });
 
+describe("When calling the route GET /quizzes/1/questions/answers it", () => {
+  const mockQuestions = [{ id: "quiz1" }];
+
+  beforeEach(() => {
+    mockDataAccessor("questions.answers.all", mockQuestions);
+  });
+
+  it("Should send a status of 403 when a non-moderator authorization token is sent", done => {
+    requestWithAuth
+      .get("/quizzes/1/questions/answers", "USER")
+      .expect(403, done);
+  });
+
+  it("Should call dataAccessor.questions.answers.all function with correct parameter", async () => {
+    await requestWithAuth.get("/quizzes/1/questions/answers", "MODERATOR");
+    expect(dataAccessor.questions.answers.all).toBeCalledWith("1");
+  });
+
+  it("Should return all questions successfully", done => {
+    requestWithAuth
+      .get("/quizzes/1/questions/answers", "MODERATOR")
+      .expect(200, { questions: mockQuestions }, done);
+  });
+});
+
 describe("When calling the route POST /quizzes/1/check it", () => {
-  const mockCorrectAnswers = [
+  const mockQuestions = [
     { id: "radio", answers: ["a"] },
     { id: "checkbox", answers: ["b", "c"] }
   ];
 
   beforeEach(() => {
-    mockDataAccessor("questions.answers.correct", mockCorrectAnswers);
+    mockDataAccessor("questions.answers.correct", mockQuestions);
   });
 
   it("Should return a status of 404 if no body is sent", done => {
@@ -212,5 +240,31 @@ describe("When calling the route POST /quizzes/1/check it", () => {
         }
       })
       .expect(200, { total: 3, correct: 2 }, done);
+  });
+});
+
+describe("When calling the route POST /users/1/scores it", () => {
+  beforeEach(() => {
+    mockDataAccessor("scores.add", true);
+  });
+
+  it("Should return a status of 404 if no body is sent", done => {
+    request.post("/users/1/scores").expect(404, done);
+  });
+
+  it("Should return a status of 404 if scores is an empty object", done => {
+    request.post("/users/1/scores").send({ score: {} }).expect(404, done);
+  });
+
+  it("Should call dataAccessor.scores.add function with correct parameter", async () => {
+    await request.post("/users/1/scores").send({ score: { correct: 1 } });
+    expect(dataAccessor.scores.add).toBeCalledWith("1", { correct: 1 });
+  });
+
+  it("Should return a status of 200 when adding successfully", done => {
+    request
+      .post("/users/1/scores")
+      .send({ score: { correct: 1 } })
+      .expect(200, done);
   });
 });

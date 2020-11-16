@@ -23,13 +23,11 @@ if (process.env.NODE_ENV !== "test") {
 }
 
 const shouldHaveRole = role => (req, res, next) => {
-  const authHeader = Object.entries(req.headers).find(
+  const [, bearerToken] = Object.entries(req.headers).find(
     ([headerKey]) => headerKey.toLowerCase() === "authorization"
   );
 
-  if (!authHeader) return res.sendStatus(403);
-
-  const authToken = jwt.decode(authHeader[1]);
+  const authToken = jwt.decode(bearerToken.slice(7));
   const currentRole = roles[authToken.role];
 
   if (currentRole < roles[role]) return res.sendStatus(403);
@@ -92,6 +90,18 @@ app.get("/quizzes/:quizId/questions", (req, res) => {
     res.json({ questions });
   });
 });
+
+app.get(
+  "/quizzes/:quizId/questions/answers",
+  shouldHaveRole("MODERATOR"),
+  (req, res) => {
+    const quizId = req.params.quizId;
+
+    dataAccessor.questions.answers.all(quizId).then(questions => {
+      res.json({ questions });
+    });
+  }
+);
 
 app.post("/quizzes/:quizId/check", (req, res) => {
   const quizId = req.params.quizId;

@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "grommet";
 
 import { axiosInstance } from "../../components";
-import { Questions, Quiz, Results } from "./";
+import { Answers, Questions, Quiz, Results } from "./";
 
 export default function QuizHandler(props) {
   const [quiz, setQuiz] = React.useState({});
@@ -49,11 +49,14 @@ export default function QuizHandler(props) {
             }}
           />
         );
+      case "answers":
+        return <Answers quizId={quizId} />;
       default:
         return (
           <Quiz
             quiz={quiz}
             viewQuestions={() => setQuizStage("questions")}
+            viewAnswers={() => setQuizStage("answers")}
             roles={roles}
             token={token}
           />

@@ -2,7 +2,14 @@ import React from "react";
 import { Box, Heading, Text, Button, Main, Card, CardBody } from "grommet";
 
 export default function Quiz(props) {
-  const { quiz, viewQuestions, roles, token, buttons = true } = props;
+  const {
+    quiz,
+    viewAnswers,
+    viewQuestions,
+    roles,
+    token,
+    buttons = true
+  } = props;
 
   function buttonList() {
     const currentRole = roles[token.role];
@@ -13,7 +20,7 @@ export default function Quiz(props) {
     }
 
     if (currentRole >= roles.MODERATOR) {
-      buttonList["Show Answers"] = () => {};
+      buttonList["Show Answers"] = viewAnswers;
     }
 
     if (currentRole >= roles.ADMIN) {
