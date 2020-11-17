@@ -18,10 +18,12 @@ app.use(
   })
 );
 
+// Add jwt validation when running in a non-test environment
 if (process.env.NODE_ENV !== "test") {
   app.use(expressJwt({ secret: jwtSecret, algorithms: ["HS256"] }));
 }
 
+// Middleware for checking if the request's auth token contains the correct role
 const shouldHaveRole = role => (req, res, next) => {
   const [, bearerToken] = Object.entries(req.headers).find(
     ([headerKey]) => headerKey.toLowerCase() === "authorization"
@@ -59,14 +61,42 @@ app.post("/quizzes", shouldHaveRole("ADMIN"), (req, res) => {
 
 app.patch("/quizzes/:quizId", shouldHaveRole("ADMIN"), (req, res) => {
   const quizId = req.params.quizId;
-  const { quiz } = req.body;
+  const { quiz, questions } = req.body;
 
-  if (!quiz || objectIsEmpty(quiz)) return res.sendStatus(404);
+  if (!quiz || objectIsEmpty(quiz) || !questions || questions.length < 1)
+    return res.sendStatus(404);
 
-  dataAccessor.quizzes
-    .update(quizId, quiz)
+  // Find out which question have been edited and which have been created
+  questionsTo = questions.reduce(
+    (acc, question) => {
+      const { id, ...questionFields } = question;
+      if (id) {
+        acc.update[id] = questionFields;
+      } else {
+        acc.insert.push(questionFields);
+      }
+      return acc;
+    },
+    { update: {}, insert: [] }
+  );
+
+  const promises = [];
+  Object.entries(questionsTo.update).forEach(([questionId, questionFields]) => {
+    promises.push(dataAccessor.questions.update(questionId, questionFields));
+  });
+
+  questionsTo.insert.forEach(questionFields => {
+    promises.push(dataAccessor.questions.add(questionFields));
+  });
+
+  promises.push(dataAccessor.quizzes.update(quizId, quiz));
+
+  Promise.all(promises)
     .then(() => res.sendStatus(200))
-    .catch(() => res.sendStatus(500));
+    .catch(err => {
+      console.error(err);
+      res.sendStatus(500);
+    });
 });
 
 app.delete("/quizzes/:quizId", shouldHaveRole("ADMIN"), (req, res) => {

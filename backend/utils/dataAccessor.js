@@ -24,6 +24,8 @@ function extractId(rowObject) {
   return rest;
 }
 
+// Handles making queries to the database, most functions return a Promise
+// The functions that return a mongodb Cursor are converted to a Promise
 function collectionQueryAsPromise(
   collectionName,
   functionName,
@@ -80,6 +82,8 @@ function findManyFromCollection(collection, selection) {
   });
 }
 
+// Aggregate queries are found in the mongodbQueries.js file
+// and allow for stricter or more complicated results
 function aggregateManyFromCollection(collection, selection) {
   return collectionQueryAsPromise(collection, "aggregate", selection, {
     extractId: true
@@ -101,7 +105,7 @@ function updateOneFromCollection(collection, selection, updateQuery) {
   return collectionQueryAsPromise(
     collection,
     "updateOne",
-    [selection, { $set: { updateQuery } }],
+    [selection, { $set: updateQuery }],
     { multiParams: true }
   );
 }
@@ -175,12 +179,18 @@ dataAccessor.questions = {
       mongodbQueries.allQuestions(quizId)
     );
   },
-  add: ({ quizId, name, answers }) => {
+  add: ({ quizId, ...newFields }) => {
     return insertIntoCollection("questions", {
-      name,
       quizId: ObjectId(quizId),
-      answers
+      ...newFields
     });
+  },
+  update: (questionId, { quizId, ...newFields }) => {
+    return updateOneFromCollection(
+      "questions",
+      { _id: ObjectId(questionId) },
+      newFields
+    );
   },
   answers: {
     all: quizId => {

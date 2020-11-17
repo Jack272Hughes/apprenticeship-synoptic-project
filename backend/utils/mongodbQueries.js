@@ -40,7 +40,7 @@ module.exports = {
     }
   ],
 
-  // Get all questions for a given quiz id
+  // Get all questions for a given quiz id and their answers
   // Don't include quizId field and don't include correct field on answers
   allQuestions: quizId => [
     { $match: { quizId: ObjectId(quizId) } },
