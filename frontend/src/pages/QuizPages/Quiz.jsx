@@ -2,6 +2,8 @@ import React from "react";
 import { Box, Heading, Text, Button, Main, Card, CardBody } from "grommet";
 import { Redirect } from "react-router-dom";
 
+import { axiosInstance } from "../../components";
+
 export default function Quiz(props) {
   const [redirect, setRedirect] = React.useState("");
 
@@ -28,7 +30,12 @@ export default function Quiz(props) {
 
     if (currentRole >= roles.ADMIN) {
       buttonList["Edit Quiz"] = () => setRedirect(`/quizzes/${quiz.id}/edit`);
-      buttonList["Delete Quiz"] = () => {};
+      buttonList["Delete Quiz"] = () => {
+        axiosInstance
+          .delete(`/quizzes/${quiz.id}`)
+          .then(() => setRedirect("/quizzes"))
+          .catch(console.error);
+      };
     }
 
     return Object.entries(buttonList).map(([buttonName, onClickFunction]) => {
