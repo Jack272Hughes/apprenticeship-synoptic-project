@@ -113,6 +113,26 @@ export default function EditQuiz(props) {
     }
   };
 
+  // Handler for removing an answer and also unselecting it if selected
+  const handleRemoveAnswer = () => {
+    const buttonGroupCopy = buttonGroupAnswers.slice();
+    const removedAnswer = String(buttonGroupCopy.splice(-1, 1));
+
+    let newSelectedAnswers = selectedAnswers;
+    if (useCheckboxes)
+      newSelectedAnswers = selectedAnswers.filter(
+        answer => answer !== removedAnswer
+      );
+    else if (selectedAnswers === removedAnswer) {
+      newSelectedAnswers = "";
+    }
+
+    setFormFields({
+      buttonGroupAnswers: buttonGroupCopy,
+      selectedAnswers: newSelectedAnswers
+    });
+  };
+
   return redirectToQuizzes ? (
     <Redirect to="/quizzes" />
   ) : (
@@ -228,18 +248,7 @@ export default function EditQuiz(props) {
             setFormFields({ answerInputField: event.target.value })
           }
         />
-        <Button
-          onClick={() => {
-            setFormFields({
-              buttonGroupAnswers: buttonGroupAnswers.slice(
-                0,
-                buttonGroupAnswers.length - 1
-              )
-            });
-          }}
-          size="xlarge"
-          plain={false}
-        >
+        <Button onClick={handleRemoveAnswer} size="xlarge" plain={false}>
           －
         </Button>
       </Box>
