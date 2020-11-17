@@ -7,9 +7,8 @@ const { createHash } = require("./helperFunctions");
 
 function generateRefreshToken(username, oldRft) {
   const rft = generateRandomBytes();
-  if (oldRft)
-    dataAccessor.refreshTokens.replace(oldRft, username, createHash(rft));
-  else dataAccessor.refreshTokens.add(createHash(rft), username);
+  if (oldRft) dataAccessor.refreshTokens.delete(oldRft, username);
+  dataAccessor.refreshTokens.add(createHash(rft), username);
   return rft;
 }
 

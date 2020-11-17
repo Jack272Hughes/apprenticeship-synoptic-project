@@ -90,17 +90,6 @@ function aggregateManyFromCollection(collection, selection) {
   });
 }
 
-function replaceOneFromCollection(collection, selection, replacement) {
-  return collectionQueryAsPromise(
-    collection,
-    "replaceOne",
-    [selection, replacement],
-    {
-      multiParams: true
-    }
-  );
-}
-
 function updateOneFromCollection(collection, selection, updateQuery) {
   return collectionQueryAsPromise(
     collection,
@@ -120,13 +109,6 @@ dataAccessor.refreshTokens = {
   },
   delete: (token, username) => {
     return deleteFromCollection("refreshTokens", { token, username });
-  },
-  replace: (token, username, newToken) => {
-    return replaceOneFromCollection(
-      "refeshTokens",
-      { token, username },
-      { token: newToken, username, createdAt: new Date() }
-    );
   },
   validate: (token, username) => {
     return findOneFromCollection("refreshTokens", { token, username });

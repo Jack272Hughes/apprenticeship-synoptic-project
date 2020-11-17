@@ -15,7 +15,7 @@ export default function TokenHandler(props) {
   if (cookies.authToken && cookies.rft) {
     setAuth(cookies.authToken, setCookies, removeCookies);
   } else {
-    removeCookies("authToken", "rft");
+    removeCookies(["authToken", "rft"]);
   }
 
   const handleSubmit = event => {
@@ -56,7 +56,7 @@ export default function TokenHandler(props) {
           .postAuth("/logout")
           .catch(console.error)
           .finally(() => {
-            removeCookies(["rft", "authToken"]);
+            removeCookies(["authToken", "rft"]);
           });
       }
     })
