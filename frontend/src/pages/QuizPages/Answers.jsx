@@ -32,7 +32,6 @@ export default function Answers(props) {
             </Box>
             <Box width="40%" align="center">
               {question.answers.map(answer => {
-                console.log(answer);
                 return (
                   <Text size="xlarge">
                     {answer.correct ? "✔️" : "❌"} {answer.value}

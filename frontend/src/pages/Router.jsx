@@ -6,7 +6,7 @@ import { Navbar } from "../components";
 import HomePage from "./Home";
 import AllQuizzesPage from "./Quizzes";
 import EditQuizPage from "./EditQuiz";
-import { QuizHandler } from "./QuizPages";
+import { QuizRouter } from "./QuizPages";
 
 export default function Routes(props) {
   const [modalContent, setModalContent] = React.useState(null);
@@ -43,20 +43,22 @@ export default function Routes(props) {
             exact
             path="/quizzes/:quizId"
             render={props => (
-              <QuizHandler
+              <QuizRouter
                 quizId={props.match.params.quizId}
                 roles={roles}
                 token={decodedToken}
               />
             )}
           />
-          <Route
-            exact
-            path="/quizzes/:quizId/edit"
-            render={props => (
-              <EditQuizPage quizId={props.match.params.quizId} />
-            )}
-          />
+          {roles[decodedToken.role] === roles.ADMIN && (
+            <Route
+              exact
+              path="/quizzes/:quizId/edit"
+              render={props => (
+                <EditQuizPage quizId={props.match.params.quizId} />
+              )}
+            />
+          )}
         </Switch>
       </Router>
     </>

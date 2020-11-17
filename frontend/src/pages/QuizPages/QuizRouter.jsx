@@ -4,7 +4,7 @@ import { Button } from "grommet";
 import { axiosInstance } from "../../components";
 import { Answers, Questions, Quiz, Results } from "./";
 
-export default function QuizHandler(props) {
+export default function QuizRouter(props) {
   const [quiz, setQuiz] = React.useState({});
   const [quizStage, setQuizStage] = React.useState("quizInfo");
   const [userAnswers, setUserAnswers] = React.useState({});

@@ -52,7 +52,7 @@ client
                   {
                     quizId: questionId,
                     name: "What is 2 + 2?",
-                    type: "radio",
+                    multipleAnswers: false,
                     answers: [
                       { correct: true, value: "4" },
                       { correct: false, value: "8" }
@@ -61,7 +61,7 @@ client
                   {
                     quizId: questionId,
                     name: "What is 4 x 6?",
-                    type: "radio",
+                    multipleAnswers: false,
                     answers: [
                       { correct: true, value: "24" },
                       { correct: false, value: "26" }
@@ -70,7 +70,7 @@ client
                   {
                     quizId: questionId,
                     name: "Which answers will result in 16?",
-                    type: "checkbox",
+                    multipleAnswers: true,
                     answers: [
                       { correct: true, value: "4 x 4" },
                       { correct: true, value: "8 x 2" },

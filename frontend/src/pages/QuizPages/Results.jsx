@@ -8,9 +8,8 @@ export default function Results(props) {
   const [meterLabel, setMeterLabel] = React.useState("");
 
   const { quiz, userAnswers, userOid, viewQuizOverview, viewQuestions } = props;
-  const totalCorrectPercentage = Math.floor(
-    (userResults.correct / userResults.total) * 100
-  );
+  const totalCorrectPercentage =
+    Math.floor((userResults.correct / userResults.total) * 100) || 0;
 
   React.useEffect(() => {
     if (quiz.id && userAnswers) {

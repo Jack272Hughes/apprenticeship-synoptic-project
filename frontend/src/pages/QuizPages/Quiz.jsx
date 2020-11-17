@@ -1,7 +1,10 @@
 import React from "react";
 import { Box, Heading, Text, Button, Main, Card, CardBody } from "grommet";
+import { Redirect } from "react-router-dom";
 
 export default function Quiz(props) {
+  const [redirect, setRedirect] = React.useState("");
+
   const {
     quiz,
     viewAnswers,
@@ -24,7 +27,7 @@ export default function Quiz(props) {
     }
 
     if (currentRole >= roles.ADMIN) {
-      buttonList["Edit Quiz"] = () => {};
+      buttonList["Edit Quiz"] = () => setRedirect(`/quizzes/${quiz.id}/edit`);
       buttonList["Delete Quiz"] = () => {};
     }
 
@@ -41,7 +44,9 @@ export default function Quiz(props) {
       );
     });
   }
-  return (
+  return redirect ? (
+    <Redirect to={redirect} />
+  ) : (
     <Main justify="center" align="center" pad="xlarge">
       <Heading>{quiz.name}</Heading>
       <Text size="xlarge">{quiz.description}</Text>

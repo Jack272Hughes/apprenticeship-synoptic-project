@@ -1,13 +1,12 @@
 import React from "react";
-import { axiosInstance } from "../../components";
+import { axiosInstance, Pagination } from "../../components";
 import {
   Box,
   Heading,
   CheckBoxGroup,
   RadioButtonGroup,
   Text,
-  Button,
-  Grommet
+  Button
 } from "grommet";
 
 export default function Question(props) {
@@ -24,55 +23,26 @@ export default function Question(props) {
       .catch(console.error);
   }, [quizId]);
 
-  const theme = {
-    button: {
-      default: {},
-      primary: {
-        color: "white",
-        background: {
-          color: "dark-2"
-        }
-      }
-    }
-  };
-
-  const handlePagination = type => {
-    if (type === "increase" && currentQuestion < questions.length - 1) {
-      setCurrentQuestion(currentQuestion + 1);
-    } else if (type === "decrease" && currentQuestion > 0) {
-      setCurrentQuestion(currentQuestion - 1);
-    }
-  };
-
   if (questions === null) return <></>;
   else if (questions.length > 0) {
     const question = questions[currentQuestion];
-    const ComponentToUse =
-      question.type === "radio" ? RadioButtonGroup : CheckBoxGroup;
+    const ComponentToUse = question.multipleAnswers
+      ? CheckBoxGroup
+      : RadioButtonGroup;
 
     const handleSelection = event => {
-      const { value } = question.type === "radio" ? event.target : event;
+      const { value } = question.multipleAnswers ? event : event.target;
       userAnswers[question.id] = value;
       setUserAnswers(userAnswers);
     };
 
     return (
       <Box justify="center" align="center" pad="medium" fill="vertical">
-        <Grommet theme={theme}>
-          <Box gap="medium" direction="row" pad="large">
-            <Button onClick={() => handlePagination("decrease")}>&lt;</Button>
-            {questions.map((question, index) => (
-              <Button
-                key={index}
-                primary={index === currentQuestion}
-                onClick={() => setCurrentQuestion(index)}
-              >
-                {index + 1}
-              </Button>
-            ))}
-            <Button onClick={() => handlePagination("increase")}>&gt;</Button>
-          </Box>
-        </Grommet>
+        <Pagination
+          currentIndex={currentQuestion}
+          setCurrentIndex={setCurrentQuestion}
+          maxLength={questions.length - 1}
+        />
         <Heading size="medium" level={2}>
           {question.name}
           <Box pad="medium" fill="vertical">

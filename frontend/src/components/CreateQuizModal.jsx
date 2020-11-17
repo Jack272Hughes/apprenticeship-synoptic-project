@@ -29,11 +29,21 @@ export default function CreateQuizModal(props) {
     <Box justify="center" align="center" pad="xlarge">
       <Heading size="medium">Create Quiz!</Heading>
       <Form value={formValue} onChange={setFormValue} onSubmit={handleSubmit}>
-        <FormField htmlFor="quiz-name" label="Name">
-          <TextInput required id="quiz-name" name="name" />
+        <FormField htmlFor="quiz-name" label="Title">
+          <TextInput
+            required
+            placeholder="Name of the quiz"
+            id="quiz-name"
+            name="name"
+          />
         </FormField>
         <FormField htmlFor="quiz-description" label="Description">
-          <TextInput required id="quiz-description" name="description" />
+          <TextInput
+            required
+            placeholder="Describe the quiz..."
+            id="quiz-description"
+            name="description"
+          />
         </FormField>
         <Box direction="row">
           <Button primary plain={false} margin="small" type="submit">
