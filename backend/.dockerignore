@@ -1,2 +1,7 @@
 server
 service
+mocks
+tests
+
+.dockerignore
+Dockerfile

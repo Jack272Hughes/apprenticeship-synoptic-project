@@ -1,7 +1,12 @@
 version: "3.8"
 services:
+  website:
+    build: "./frontend"
+    ports:
+      - "3000:80"
+
   auth:
-    build: "./auth-service"
+    build: "./backend/auth-service"
     ports:
       - "5000:5000"
     networks:
@@ -10,7 +15,7 @@ services:
       - production=docker
 
   server:
-    build: "./server"
+    build: "./backend/server"
     ports:
       - "8080:8080"
     networks:
@@ -19,14 +24,16 @@ services:
       - production=docker
 
   mongodb:
-    image: mongo
+    image: mongo:3.6.21
     restart: always
     networks:
       - backend
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: password
+      ME_CONFIG_MONGODB_ADMINUSERNAME: "root"
+      ME_CONFIG_MONGODB_ADMINPASSWORD: "password"
+      MONGO_INITDB_DATABASE: "quizmaster"
     volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js:ro
       - database:/var/lib/mongodb
 
 networks:
