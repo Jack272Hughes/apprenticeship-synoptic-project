@@ -4,7 +4,7 @@ For my synoptic project I have chosen to do the quiz master app. All documentati
 
 # Seed Data
 
-When the app is started using any of the methods listed below, you can access the website at http://localhost:3000 and there will be some data already inserted into the database.
+When the app has been started, using any of the methods listed under the heading 'Starting Quizmaster App', you can access the website at http://localhost:3000 and there will be some data already inserted into the database.
 
 The first is a simple quiz that shows off both multiple answer and single answer questions.
 
