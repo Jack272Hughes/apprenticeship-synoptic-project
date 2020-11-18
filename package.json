@@ -3,6 +3,6 @@
         "docker:build": "cd backend && docker build -t backend_base:latest ./ && cd .. && docker-compose build",
         "docker:start": "docker-compose up -d",
         "docker:stop": "docker-compose stop",
-        "docker:clean": "docker-compose down && docker rmi backend_base mock-synoptic_server mock-synoptic_auth mock-synoptic_website"
+        "docker:clean": "docker-compose down && docker rmi backend_base quizmaster_server quizmaster_auth quizmaster_website"
     }
 }
