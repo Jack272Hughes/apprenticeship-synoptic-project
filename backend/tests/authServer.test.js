@@ -1,5 +1,5 @@
 const supertest = require("supertest");
-const server = require("./authServer");
+const server = require("../auth-service/authServer");
 
 const jwtHandling = require("../utils/JWTHandling.js");
 const helperFunctions = require("../utils/helperFunctions.js");

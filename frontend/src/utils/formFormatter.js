@@ -102,8 +102,4 @@ function validateFormData(formData) {
   return foundError ? errors : null;
 }
 
-module.exports = {
-  formDataToDatabaseObject,
-  databaseObjectToFormData,
-  validateFormData
-};
+export { formDataToDatabaseObject, databaseObjectToFormData, validateFormData };

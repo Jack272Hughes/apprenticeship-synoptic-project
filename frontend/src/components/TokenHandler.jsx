@@ -3,7 +3,6 @@ import jwt from "jsonwebtoken";
 
 import { axiosInstance, useCookies } from "./";
 import Login from "../pages/Login";
-import { setAuth } from "./axiosInstance";
 
 export default function TokenHandler(props) {
   const [cookies, setCookies, removeCookies] = useCookies(["authToken", "rft"]);
@@ -13,7 +12,7 @@ export default function TokenHandler(props) {
   const decodedToken = jwt.decode(cookies.authToken);
 
   if (cookies.authToken && cookies.rft) {
-    setAuth(cookies.authToken, setCookies, removeCookies);
+    axiosInstance.setAuth(cookies.authToken, setCookies, removeCookies);
   } else {
     removeCookies(["authToken", "rft"]);
   }

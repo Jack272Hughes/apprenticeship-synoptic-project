@@ -1,8 +1,8 @@
 const supertest = require("supertest");
-const server = require("./server");
+const server = require("../server/server");
 
 const dataAccessor = require("../utils/dataAccessor");
-const mockAuthTokens = require("./mockAuthTokens");
+const mockAuthTokens = require("../server/mockAuthTokens");
 
 jest.unmock("jsonwebtoken");
 let app, request;

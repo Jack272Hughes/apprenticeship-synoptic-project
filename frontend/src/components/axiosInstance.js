@@ -47,12 +47,12 @@ const requestGenerator = (instance, method) => (url, params) => {
   return instance[method](url, params).catch(console.error);
 };
 
-module.exports = {
+export default {
   get: requestGenerator(serverInstance, "get"),
   post: requestGenerator(serverInstance, "post"),
   patch: requestGenerator(serverInstance, "patch"),
   delete: requestGenerator(serverInstance, "delete"),
   postAuth: requestGenerator(authInstance, "post"),
-  setAuth,
-  getNewToken
+  setAuth: setAuth,
+  getNewToken: getNewToken
 };

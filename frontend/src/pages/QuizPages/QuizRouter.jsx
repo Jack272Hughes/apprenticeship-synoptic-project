@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "grommet";
 
 import { axiosInstance } from "../../components";
-import { Answers, Questions, Quiz, Results } from "./";
+import { Answers, Questions, QuizOverview, Results } from "./";
 
 export default function QuizRouter(props) {
   const [quiz, setQuiz] = React.useState({});
@@ -53,7 +53,7 @@ export default function QuizRouter(props) {
         return <Answers quizId={quizId} />;
       default:
         return (
-          <Quiz
+          <QuizOverview
             quiz={quiz}
             viewQuestions={() => setQuizStage("questions")}
             viewAnswers={() => setQuizStage("answers")}

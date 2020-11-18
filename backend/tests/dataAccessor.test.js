@@ -1,4 +1,4 @@
-const dataAccessor = jest.requireActual("../dataAccessor");
+const dataAccessor = jest.requireActual("../utils/dataAccessor");
 
 it("Should use the non-mocked version of dataAccessor", () => {
   console.log(dataAccessor.refreshTokens.add);
