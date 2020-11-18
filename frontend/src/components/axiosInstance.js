@@ -44,7 +44,7 @@ serverInstance.interceptors.request.use(async req => {
 
 const requestGenerator = (instance, method) => (url, params) => {
   if (method.match(/get|delete/)) params = { params };
-  return instance[method](url, params).catch(console.error);
+  return instance[method](url, params);
 };
 
 export default {

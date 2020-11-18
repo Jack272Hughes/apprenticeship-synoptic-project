@@ -3,6 +3,7 @@
         "docker:build": "cd backend && docker build -t backend_base:latest ./ && cd .. && docker-compose build",
         "docker:start": "docker-compose up -d",
         "docker:stop": "docker-compose stop",
-        "docker:clean": "docker-compose down && docker rmi backend_base quizmaster_server quizmaster_auth quizmaster_website"
+        "docker:clean": "docker-compose down && docker rmi backend_base quizmaster_server quizmaster_auth quizmaster_website",
+        "test": "yarn docker:stop && docker-compose rm -fv mongodb && yarn docker:start"
     }
 }

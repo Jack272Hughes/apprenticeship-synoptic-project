@@ -3,10 +3,12 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-jwt": "^6.0.0",
-    "jest": "^26.6.3",
     "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.6.0",
-    "multer": "^1.4.2",
+    "multer": "^1.4.2"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3",
     "supertest": "^6.0.1"
   },
   "scripts": {

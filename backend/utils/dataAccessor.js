@@ -147,10 +147,10 @@ dataAccessor.quizzes = {
     );
   },
   update: (quizId, quiz) => {
-    updateOneFromCollection("quizzes", { _id: ObjectId(quizId) }, quiz);
+    return updateOneFromCollection("quizzes", { _id: ObjectId(quizId) }, quiz);
   },
   delete: quizId => {
-    deleteFromCollection("quizzes", { _id: ObjectId(quizId) });
+    return deleteFromCollection("quizzes", { _id: ObjectId(quizId) });
   }
 };
 
