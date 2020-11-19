@@ -2,7 +2,7 @@ import React from "react";
 import { Nav, Anchor, Header, Box } from "grommet";
 import { Link } from "react-router-dom";
 
-import { CreateQuizModal } from "../components";
+import { CreateQuizModal } from "./";
 
 export default function Navbar(props) {
   const { token, roles, logout, setModalContent } = props;

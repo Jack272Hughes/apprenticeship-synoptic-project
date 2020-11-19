@@ -11,7 +11,8 @@ import {
 } from "grommet";
 import { Redirect } from "react-router-dom";
 
-import { axiosInstance, Pagination } from "../components";
+import { Pagination } from "../components";
+import { axiosInstance, formFormatter } from "../utils";
 import {
   formDataToDatabaseObject,
   databaseObjectToFormData,
@@ -56,18 +57,21 @@ export default function EditQuiz(props) {
         setQuizDescription(quiz.description);
 
         if (questions.length > 0)
-          setFormData(databaseObjectToFormData(questions));
+          setFormData(formFormatter.databaseObjectToFormData(questions));
       })
       .catch(() => setRedirectToQuizzes(true));
   }, [props.quizId]);
 
   // Error handling and saving quiz changes to the database
   const handleSave = () => {
-    const errors = validateFormData(formData);
+    const errors = formFormatter.validateFormData(formData);
     if (errors) return setErrors(Object.entries(errors));
     else if (!quizName || !quizDescription) return;
     else {
-      const databaseFormat = formDataToDatabaseObject(props.quizId, formData);
+      const databaseFormat = formFormatter.formDataToDatabaseObject(
+        props.quizId,
+        formData
+      );
       axiosInstance
         .patch(`/quizzes/${props.quizId}`, {
           questions: databaseFormat,

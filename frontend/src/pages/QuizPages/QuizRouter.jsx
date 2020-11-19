@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "grommet";
 
-import { axiosInstance } from "../../components";
+import { axiosInstance } from "../../utils";
 import { Answers, Questions, QuizOverview, Results } from "./";
 
 export default function QuizRouter(props) {

@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Heading, Text } from "grommet";
 
-import { axiosInstance } from "../../components";
+import { axiosInstance } from "../../utils";
 
 export default function Answers(props) {
   const [questions, setQuestions] = React.useState([]);

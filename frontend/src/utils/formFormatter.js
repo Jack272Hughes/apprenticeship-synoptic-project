@@ -102,4 +102,8 @@ function validateFormData(formData) {
   return foundError ? errors : null;
 }
 
-export { formDataToDatabaseObject, databaseObjectToFormData, validateFormData };
+export default {
+  formDataToDatabaseObject,
+  databaseObjectToFormData,
+  validateFormData
+};

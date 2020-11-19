@@ -1,5 +1,5 @@
 import React from "react";
-import { axiosInstance } from "../components";
+import { axiosInstance } from "../utils";
 import { useHistory } from "react-router-dom";
 
 import { Card, CardHeader, CardBody, Heading, Box } from "grommet";

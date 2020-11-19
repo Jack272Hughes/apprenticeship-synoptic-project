@@ -1,5 +1,6 @@
 import React from "react";
-import { axiosInstance, Pagination } from "../../components";
+import { Pagination } from "../../components";
+import { axiosInstance } from "../../utils";
 import {
   Box,
   Heading,

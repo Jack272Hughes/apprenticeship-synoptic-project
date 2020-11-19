@@ -1,7 +1,7 @@
 import React from "react";
 import jwt from "jsonwebtoken";
 
-import { axiosInstance, useCookies } from "./";
+import { axiosInstance, useCookies } from "../utils";
 import Login from "../pages/Login";
 
 export default function TokenHandler(props) {

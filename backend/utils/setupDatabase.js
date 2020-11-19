@@ -1,7 +1,8 @@
 const url = "mongodb://localhost:27017";
 const dbName = "quizmaster";
+const { MongoClient, ObjectId } = require("mongodb");
 
-const client = new require("mongodb").MongoClient(url, {
+const client = new MongoClient(url, {
   useUnifiedTopology: true
 });
 

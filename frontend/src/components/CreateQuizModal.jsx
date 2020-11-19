@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Heading, Form, FormField, Button, TextInput } from "grommet";
 import { Redirect } from "react-router-dom";
 
-import { axiosInstance } from "./";
+import { axiosInstance } from "../utils";
 
 export default function CreateQuizModal(props) {
   const [redirectRoute, setRedirectRoute] = React.useState(false);
@@ -46,7 +46,13 @@ export default function CreateQuizModal(props) {
           />
         </FormField>
         <Box direction="row">
-          <Button primary plain={false} margin="small" type="submit">
+          <Button
+            a11yTitle="create-quiz-button"
+            primary
+            plain={false}
+            margin="small"
+            type="submit"
+          >
             Create
           </Button>
           <Button

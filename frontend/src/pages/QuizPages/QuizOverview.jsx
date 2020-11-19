@@ -2,7 +2,7 @@ import React from "react";
 import { Box, Heading, Text, Button, Main, Card, CardBody } from "grommet";
 import { Redirect } from "react-router-dom";
 
-import { axiosInstance } from "../../components";
+import { axiosInstance } from "../../utils";
 
 export default function Quiz(props) {
   const [redirect, setRedirect] = React.useState("");

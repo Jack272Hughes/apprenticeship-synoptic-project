@@ -1,5 +1,7 @@
 {
     "scripts": {
+        "mongo:start": "docker run -d -p 27017:27017 --name mongo-db mongo && node ./backend/utils/setupDatabase.js",
+        "mongo:reset": "docker stop mongo-db && docker rm mongo-db && yarn mongo:start",
         "docker:build": "cd backend && docker build -t backend_base:latest ./ && cd .. && docker-compose build",
         "docker:start": "docker-compose up -d",
         "docker:stop": "docker-compose stop",

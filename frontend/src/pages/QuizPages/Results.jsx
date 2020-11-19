@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Heading, Stack, Text, Meter, Button } from "grommet";
 
-import { axiosInstance } from "../../components";
+import { axiosInstance } from "../../utils";
 
 export default function Results(props) {
   const [userResults, setUserResults] = React.useState({});
