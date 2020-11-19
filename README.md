@@ -67,26 +67,34 @@ Should the docker containers not properly boot up then you can manually start th
 
 ### Start MongoDB Instance
 
-The following command will start a mongodb instance in a docker container named "mongo-db" and connect to port 27017
-
-```
-docker run -d -p 27017:27017 --name mongo-db mongo
-```
-
-Once this is running, from the root folder, run the following command to get the simple pre-made quiz and three users with the different roles as explained later.
-
-```
-node ./backend/utils/setupDatabase.js
-```
+When in the root folder enter `yarn mongo:start` and it will start a mongodb instance in a docker container named "mongo-db" and connect to port 27017. It will then setup the database by running the setup file locatated at `./backend/utils/setupDatabase.js`.
 
 ### Start Frontend
 
-Simply cd into the frontend folder and type `yarn start`
+Simply cd into the frontend folder and enter `yarn start`
 
 ### Start Server
 
-Simply cd into the backend folder and type `yarn start:server`
+Simply cd into the backend folder and enter `yarn start:server`
 
 ### Start Auth Service
 
-Simply cd into the backend folder and type `yarn start:auth`
+Simply cd into the backend folder and enter `yarn start:auth`
+
+# Running Tests
+
+To run all the tests, make sure you have started the app using one of the methods above and then enter the command `yarn test` in the root folder.
+
+To be able to run the cypress tests multiple times, you unforunately have to reset the database. There are two commands that can be run in the root folder to do this:
+
+```
+// For when running with docker
+yarn docker:reset
+
+// For when running manually
+yarn mongo:reset
+```
+
+The generated videos that cypress created when I ran the tests have been put in the cypress-videos folder.
+
+If you want to run just the cypress tests or just the jest tests you can enter `yarn test:cypress` and `yarn test:jest` respectively, in the root folder.

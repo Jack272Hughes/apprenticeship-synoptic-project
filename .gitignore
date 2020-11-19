@@ -1,6 +1,9 @@
 backend/node_modules
+
+cypress-videos
+
 frontend/node_modules
 frontend/build
-
 frontend/cypress/videos
 frontend/cypress/screenshots
+
