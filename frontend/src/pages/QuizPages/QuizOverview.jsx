@@ -55,8 +55,10 @@ export default function Quiz(props) {
     <Redirect to={redirect} />
   ) : (
     <Main justify="center" align="center" pad="xlarge">
-      <Heading>{quiz.name}</Heading>
-      <Text size="xlarge">{quiz.description}</Text>
+      <Heading textAlign="center">{quiz.name}</Heading>
+      <Text textAlign="center" size="xlarge">
+        {quiz.description}
+      </Text>
       <Box pad="large" gap="small" direction="row">
         <Card>
           <CardBody pad="small" background="dark-3">

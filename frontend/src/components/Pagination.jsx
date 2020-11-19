@@ -30,6 +30,7 @@ export default function Pagination(props) {
     for (let pageIndex = 0; pageIndex <= maxLength; pageIndex++) {
       pageNumbers.push(
         <Button
+          a11yTitle={`pagination-button-${pageIndex + 1}`}
           key={pageIndex}
           primary={pageIndex === currentIndex}
           onClick={() => setCurrentIndex(pageIndex)}
@@ -45,9 +46,19 @@ export default function Pagination(props) {
   return (
     <Grommet theme={theme}>
       <Box gap="medium" direction="row" pad="large">
-        <Button onClick={() => handlePagination("decrease")}>&lt;</Button>
+        <Button
+          a11yTitle="pagination-previous-button"
+          onClick={() => handlePagination("decrease")}
+        >
+          &lt;
+        </Button>
         {createPageNumbers()}
-        <Button onClick={() => handlePagination("increase")}>&gt;</Button>
+        <Button
+          a11yTitle="pagination-next-button"
+          onClick={() => handlePagination("increase")}
+        >
+          &gt;
+        </Button>
       </Box>
     </Grommet>
   );

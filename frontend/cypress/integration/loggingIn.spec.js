@@ -14,10 +14,10 @@ const requestBodyContains = shouldContain => xhr => {
   });
 };
 
-beforeEach(() => cy.visit("http://localhost:3000"));
-
 describe("When signing up to the app it", () => {
-  it("Should make a POST request to /signup", () => {
+  beforeEach(() => cy.visit("http://localhost:3000"));
+
+  it("Should allow you to sign up and log you in", () => {
     cy.server();
     cy.route("POST", "/signup").as("signupRequest");
     attemptLogIn("username1", "password1", "Sign Up");
@@ -25,21 +25,19 @@ describe("When signing up to the app it", () => {
     cy.get("@signupRequest").then(
       requestBodyContains({ username: "username1", password: "password1" })
     );
-  });
-
-  it("Should allow you to sign up and log you in", () => {
-    attemptLogIn("username2", "password2", "Sign Up");
-    cy.contains("username2").should("exist");
+    cy.contains("username1").should("exist");
   });
 
   it("Shouldn't allow you to sign up with a username that is in use", () => {
-    attemptLogIn("username2", "password2", "Sign Up");
+    attemptLogIn("User", "password", "Sign Up");
     cy.contains("Username is already in use").should("exist");
   });
 });
 
 describe("When logging into the app it", () => {
-  it("Should make a POST request to /login", () => {
+  beforeEach(() => cy.visit("http://localhost:3000"));
+
+  it("Should allow you to log in", () => {
     cy.server();
     cy.route("POST", "/login").as("loginRequest");
     attemptLogIn();
@@ -49,7 +47,7 @@ describe("When logging into the app it", () => {
     );
   });
 
-  it("Should allow you to log in and display username", () => {
+  it("Should show your username in the navbar", () => {
     attemptLogIn();
     cy.contains("User").should("exist");
   });
@@ -61,11 +59,18 @@ describe("When logging into the app it", () => {
 
   it("Should come up with an error when username doesn't exist", () => {
     attemptLogIn("unknown", "password");
-    cy.contains("Username does not exist").should("exist");
+    cy.contains("Incorrect username/password").should("exist");
   });
 });
 
 describe("When logged into the app it", () => {
+  beforeEach(() => cy.visit("http://localhost:3000"));
+
+  it("Should have a button called Logout in the navbar", () => {
+    attemptLogIn();
+    cy.contains("Logout");
+  });
+
   it("Should allow you to log out", () => {
     attemptLogIn();
     cy.contains("Logout").click();

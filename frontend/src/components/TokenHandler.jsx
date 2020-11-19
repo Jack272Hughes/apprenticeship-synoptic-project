@@ -33,7 +33,7 @@ export default function TokenHandler(props) {
             setErrorMsg("Incorrect username/password");
             break;
           case 404:
-            setErrorMsg("Username does not exist");
+            setErrorMsg("Incorrect username/password");
             break;
           case 409:
             setErrorMsg("Username is already in use");

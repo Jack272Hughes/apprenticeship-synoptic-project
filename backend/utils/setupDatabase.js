@@ -132,12 +132,12 @@ client
         },
         {
           quizId: ObjectId("5fb589da1e1cfcd1fef45633"),
-          name: "What does LOL stand for?",
-          multipleAnswers: false,
+          name: "What does LOL not stand for?",
+          multipleAnswers: true,
           answers: [
-            { correct: false, value: "Nothing" },
-            { correct: false, value: "Lots Of Love" },
-            { correct: true, value: "Laugh Out Loud" }
+            { correct: true, value: "Load Of Laughs" },
+            { correct: true, value: "Lots Of Love" },
+            { correct: false, value: "Laugh Out Loud" }
           ]
         },
         {

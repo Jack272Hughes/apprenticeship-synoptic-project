@@ -13,11 +13,6 @@ import { Redirect } from "react-router-dom";
 
 import { Pagination } from "../components";
 import { axiosInstance, formFormatter } from "../utils";
-import {
-  formDataToDatabaseObject,
-  databaseObjectToFormData,
-  validateFormData
-} from "../utils/formFormatter";
 
 export default function EditQuiz(props) {
   // Object to be used as a template for each question
@@ -144,6 +139,7 @@ export default function EditQuiz(props) {
       {/* Text fields for changing quiz title and description */}
       <FormField width="medium" label={<Text size="xlarge">Quiz Name</Text>}>
         <TextInput
+          name="quiz-name"
           onBlur={event => event.target.reportValidity()}
           onChange={event => setQuizName(event.target.value)}
           value={quizName}
@@ -157,6 +153,7 @@ export default function EditQuiz(props) {
         label={<Text size="large">Quiz Description</Text>}
       >
         <TextInput
+          name="quiz-description"
           onBlur={event => event.target.reportValidity()}
           onChange={event => setQuizDescription(event.target.value)}
           value={quizDescription}
@@ -194,6 +191,7 @@ export default function EditQuiz(props) {
         label={<Text size="xlarge">Question</Text>}
       >
         <TextInput
+          name="question-name"
           value={questionValue}
           onChange={event =>
             setFormFields({ questionValue: event.target.value })
@@ -201,12 +199,12 @@ export default function EditQuiz(props) {
           size="large"
           required
           placeholder="What is the question?"
-          name="question-name"
         />
       </FormField>
 
       {/* Switch for choosing if you can pick multiple answers */}
       <CheckBox
+        name="question-multiple-answers"
         checked={useCheckboxes}
         onChange={event => {
           const { checked } = event.target;
@@ -215,7 +213,6 @@ export default function EditQuiz(props) {
             useCheckboxes: checked
           });
         }}
-        name="question-type"
         toggle
         label="Select Multiple"
       />
@@ -223,9 +220,9 @@ export default function EditQuiz(props) {
       {/* Button group of either checkboxes or radio buttons (defined by the switch above)
       for creating answers and choosing which ones are the correct answers */}
       <ButtonGroup
+        name="question-answers"
         required
         margin="medium"
-        name="question-answers"
         options={buttonGroupAnswers}
         value={selectedAnswers}
         onChange={handleSelection}
@@ -243,6 +240,7 @@ export default function EditQuiz(props) {
           ＋
         </Button>
         <TextInput
+          name="new-answer"
           onKeyDown={event => {
             if (event.key === "Enter") handleNewAnswer();
           }}
