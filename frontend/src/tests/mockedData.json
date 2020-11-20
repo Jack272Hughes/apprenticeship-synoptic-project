@@ -1,0 +1,157 @@
+{
+  "roles": {
+    "USER": 0,
+    "MODERATOR": 1,
+    "ADMIN": 2
+  },
+  "mockedAuthToken": "eyJhbGciOiJIUzI1NiJ9.eyJvaWQiOiJ1c2VyT2lkIn0.zgqCtR8OVYh7XQyJCv4ZM-H9PlVcnElpbsSGzIi5MXI",
+  "bearerToken": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjYwMH0.uAzqHnWSxjn4YONiQ696K11_GgJNc2Uk5IZ9eJmEKY8",
+  "mockQuestions": [
+    {
+      "name": "Question1",
+      "id": "questionId1",
+      "multipleAnswers": false,
+      "answers": [
+        {
+          "value": "Answer1"
+        },
+        {
+          "value": "Answer2"
+        },
+        {
+          "value": "Answer3"
+        },
+        {
+          "value": "Answer4"
+        }
+      ]
+    },
+    {
+      "name": "Question2",
+      "id": "questionId2",
+      "multipleAnswers": true,
+      "answers": [
+        {
+          "value": "Answer1"
+        },
+        {
+          "value": "Answer2"
+        },
+        {
+          "value": "Answer3"
+        },
+        {
+          "value": "Answer4"
+        }
+      ]
+    }
+  ],
+  "mockAnswers": [
+    {
+      "name": "Question1",
+      "id": "questionId1",
+      "multipleAnswers": false,
+      "answers": [
+        {
+          "value": "CorrectAnswer",
+          "correct": true
+        },
+        {
+          "value": "IncorrectAnswer",
+          "correct": false
+        }
+      ]
+    },
+    {
+      "name": "Question2",
+      "id": "questionId2",
+      "multipleAnswers": true,
+      "answers": [
+        {
+          "value": "CorrectAnswer1",
+          "correct": true
+        },
+        {
+          "value": "CorrectAnswer2",
+          "correct": true
+        },
+        {
+          "value": "IncorrectAnswer1",
+          "correct": false
+        },
+        {
+          "value": "IncorrectAnswer2",
+          "correct": false
+        }
+      ]
+    }
+  ],
+  "mockQuizzes": [
+    {
+      "id": "123abc",
+      "name": "QuizName1",
+      "description": "QuizDescription1",
+      "totalQuestions": 4,
+      "maximumScore": 4
+    },
+    {
+      "id": "456def",
+      "name": "QuizName2",
+      "description": "QuizDescription2",
+      "totalQuestions": 4,
+      "maximumScore": 4
+    }
+  ],
+  "savedQuiz": {
+    "questions": [
+      {
+        "answers": [
+          {
+            "correct": false,
+            "value": "CorrectAnswer"
+          },
+          {
+            "correct": false,
+            "value": "IncorrectAnswer"
+          },
+          {
+            "correct": true,
+            "value": "NewValue"
+          }
+        ],
+        "id": "questionId1",
+        "multipleAnswers": false,
+        "name": "NewValue",
+        "quizId": "123abc"
+      },
+      {
+        "answers": [
+          {
+            "correct": true,
+            "value": "CorrectAnswer1"
+          },
+          {
+            "correct": true,
+            "value": "CorrectAnswer2"
+          },
+          {
+            "correct": false,
+            "value": "IncorrectAnswer1"
+          },
+          {
+            "correct": false,
+            "value": "IncorrectAnswer2"
+          }
+        ],
+        "id": "questionId2",
+        "multipleAnswers": true,
+        "name": "Question2",
+        "quizId": "123abc"
+      }
+    ],
+    "quiz": {
+      "description": "NewValue",
+      "name": "NewValue"
+    }
+  }
+}

@@ -44,6 +44,9 @@ afterAll(() => {
 
   If options contain { resetLast: true } then it will only reset the mocked function after all tests in a file
   have been finished but will still clear function calls between tests.
+
+  To make sure the dataAccessorMock isn't the cause of any unsuccessful tests due to bad mocking, tests
+  have been created and stored within this folder
 */
 global.mockDataAccessor = (functionRoute, returnedValue, options = {}) => {
   accessorFunction = functionRoute

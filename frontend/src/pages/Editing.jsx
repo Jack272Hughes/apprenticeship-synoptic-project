@@ -37,8 +37,8 @@ export default function EditQuiz(props) {
   // Total existing questions can be 0 however quiz name and description should always be defined
   React.useEffect(() => {
     const getQuizInfo = [
-      axiosInstance.get(`quizzes/${props.quizId}`),
-      axiosInstance.get(`quizzes/${props.quizId}/questions/answers`)
+      axiosInstance.get(`/quizzes/${props.quizId}`),
+      axiosInstance.get(`/quizzes/${props.quizId}/questions/answers`)
     ];
 
     Promise.all(getQuizInfo)
@@ -137,8 +137,13 @@ export default function EditQuiz(props) {
   ) : (
     <Box justify="center" align="center" pad="medium" fill="vertical">
       {/* Text fields for changing quiz title and description */}
-      <FormField width="medium" label={<Text size="xlarge">Quiz Name</Text>}>
+      <FormField
+        htmlFor="quiz-name"
+        width="medium"
+        label={<Text size="xlarge">Quiz Name</Text>}
+      >
         <TextInput
+          id="quiz-name"
           name="quiz-name"
           onBlur={event => event.target.reportValidity()}
           onChange={event => setQuizName(event.target.value)}
@@ -149,10 +154,12 @@ export default function EditQuiz(props) {
         />
       </FormField>
       <FormField
+        htmlFor="quiz-description"
         width="large"
         label={<Text size="large">Quiz Description</Text>}
       >
         <TextInput
+          id="quiz-description"
           name="quiz-description"
           onBlur={event => event.target.reportValidity()}
           onChange={event => setQuizDescription(event.target.value)}
@@ -186,11 +193,13 @@ export default function EditQuiz(props) {
 
       {/* Text field for changing the question */}
       <FormField
+        htmlFor="question-name"
         margin="medium"
         width="large"
         label={<Text size="xlarge">Question</Text>}
       >
         <TextInput
+          id="question-name"
           name="question-name"
           value={questionValue}
           onChange={event =>
@@ -236,7 +245,7 @@ export default function EditQuiz(props) {
         align="center"
         width="large"
       >
-        <Button onClick={handleNewAnswer} size="xlarge" plain={false}>
+        <Button onClick={handleNewAnswer} size="large" plain={false}>
           ＋
         </Button>
         <TextInput
@@ -250,7 +259,7 @@ export default function EditQuiz(props) {
             setFormFields({ answerInputField: event.target.value })
           }
         />
-        <Button onClick={handleRemoveAnswer} size="xlarge" plain={false}>
+        <Button onClick={handleRemoveAnswer} size="large" plain={false}>
           －
         </Button>
       </Box>

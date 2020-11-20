@@ -9,6 +9,6 @@
         "docker:reset": "yarn docker:stop && docker-compose rm -fv mongodb && yarn docker:start",
         "test": "cd frontend && yarn test && cd ../backend && yarn test",
         "test:cypress": "cd frontend && yarn test:cypress",
-        "test:jest": "cd frontend && yarn test:jest && cd ../backend && yarn test"
+        "test:jest": "cd ./backend && yarn test && cd ../frontend && yarn test:jest --watchAll=false"
     }
 }

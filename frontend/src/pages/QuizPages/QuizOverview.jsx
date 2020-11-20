@@ -41,6 +41,7 @@ export default function Quiz(props) {
     return Object.entries(buttonList).map(([buttonName, onClickFunction]) => {
       return (
         <Button
+          a11yTitle={`${buttonName.toLowerCase().replace(" ", "-")}-button`}
           key={buttonName}
           plain={false}
           primary

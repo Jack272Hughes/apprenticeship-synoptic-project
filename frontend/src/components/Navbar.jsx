@@ -34,7 +34,7 @@ export default function Navbar(props) {
       <Nav direction="row" gap="large">
         {itemList().map(item => (
           <Anchor
-            as={({ colorProp, hasIcon, hasLabel, ...props }) => {
+            as={({ colorProp, hasIcon, hasLabel, focus, ...props }) => {
               if (item.href) {
                 return (
                   <Link {...props} to={item.href}>

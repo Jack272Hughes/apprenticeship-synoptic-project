@@ -15,9 +15,10 @@ export default function Answers(props) {
 
   return (
     <Box justify="center" align="center" pad="xlarge">
-      {questions.map(question => {
+      {questions.map((question, questionIndex) => {
         return (
           <Box
+            key={questionIndex}
             justify="center"
             direction="row"
             align="center"
@@ -31,9 +32,9 @@ export default function Answers(props) {
               <Heading size="small">{question.name}</Heading>
             </Box>
             <Box width="40%" align="center">
-              {question.answers.map(answer => {
+              {question.answers.map((answer, answerIndex) => {
                 return (
-                  <Text size="xlarge">
+                  <Text key={answerIndex} size="xlarge">
                     {answer.correct ? "✔️" : "❌"} {answer.value}
                   </Text>
                 );

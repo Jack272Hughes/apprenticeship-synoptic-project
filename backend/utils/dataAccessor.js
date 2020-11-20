@@ -121,7 +121,7 @@ dataAccessor.users = {
       username,
       password,
       salt,
-      role: "user"
+      role: "USER"
     });
   },
   find: username => {

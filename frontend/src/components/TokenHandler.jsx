@@ -5,7 +5,7 @@ import { axiosInstance, useCookies } from "../utils";
 import Login from "../pages/Login";
 
 export default function TokenHandler(props) {
-  const [cookies, setCookies, removeCookies] = useCookies(["authToken", "rft"]);
+  const [cookies, setCookies, removeCookies] = useCookies();
   const [errorMsg, setErrorMsg] = React.useState("");
   const [signingUp, setSigningup] = React.useState(false);
 
@@ -22,7 +22,7 @@ export default function TokenHandler(props) {
     event.preventDefault();
     const data = new FormData(event.target);
     axiosInstance
-      .postAuth(signingUp ? "signup" : "login", data)
+      .postAuth(signingUp ? "/signup" : "/login", data)
       .then(response => {
         setCookies({ authToken: response.data.token, rft: response.data.rft });
       })
@@ -48,7 +48,6 @@ export default function TokenHandler(props) {
   // Inject the authToken and logout function
   return cookies.authToken ? (
     React.cloneElement(props.children, {
-      getNewToken: axiosInstance.getNewToken,
       decodedToken: decodedToken,
       logout: () => {
         axiosInstance

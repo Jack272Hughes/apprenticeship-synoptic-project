@@ -53,6 +53,5 @@ export default {
   patch: requestGenerator(serverInstance, "patch"),
   delete: requestGenerator(serverInstance, "delete"),
   postAuth: requestGenerator(authInstance, "post"),
-  setAuth: setAuth,
-  getNewToken: getNewToken
+  setAuth: setAuth
 };

@@ -109,15 +109,32 @@ describe("When calling the route PATCH /quizzes/1 it", () => {
     requestWithAuth.patch("/quizzes/1", "MODERATOR").expect(403, done);
   });
 
-  it("Should call dataAccessor.quizzes.update function wuth correct parameters", async () => {
-    await requestWithAuth.patch("/quizzes/1", "ADMIN").send(mockQuiz);
-    expect(dataAccessor.quizzes.update).toBeCalledWith("1", { name: "quiz1" });
+  it("Should call dataAccessor.questions.update function when questions have been sent with an id", async () => {
+    const dataObject = {
+      ...mockQuiz,
+      questions: [{ id: 1, otherField: "otherField" }]
+    };
+    await requestWithAuth.patch("/quizzes/1", "ADMIN").send(dataObject);
+    expect(dataAccessor.questions.update).toBeCalledWith("1", {
+      otherField: "otherField"
+    });
+  });
+
+  it("Should call dataAccessor.questions.add function when questions have been sent without an id", async () => {
+    const dataObject = {
+      ...mockQuiz,
+      questions: [{ otherField: "otherField" }]
+    };
+    await requestWithAuth.patch("/quizzes/1", "ADMIN").send(dataObject);
+    expect(dataAccessor.questions.add).toBeCalledWith({
+      otherField: "otherField"
+    });
   });
 
   it("Should send a status of 200 when updating successfully", done => {
     requestWithAuth
       .patch("/quizzes/1", "ADMIN")
-      .send(mockQuiz)
+      .send({ ...mockQuiz, questions: [{ otherField: "otherField" }] })
       .expect(200, done);
   });
 });
@@ -158,7 +175,7 @@ describe("When calling the route GET /quizzes/1 it", () => {
   });
 });
 
-describe("When calling the route GET /quizzes/:quizId/questions it", () => {
+describe("When calling the route GET /quizzes/1/questions it", () => {
   const mockQuestions = [{ name: "question1" }, { name: "question2" }];
 
   beforeEach(() => {
